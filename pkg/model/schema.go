@@ -48,3 +48,51 @@ type BasicConstraints struct {
 	MinItems *int `json:"minItems"`
 	MaxItems *int `json:"maxItems"`
 }
+
+// GenerateIDs generates all ID's used for validating user input against the form schema and validation rules.
+// The function sets all ID's of the contained Sections, subsections and fields.
+func (w *WebFormSchema) GenerateIDs() {
+	currentNumber := 1
+	for _, section := range w.Sections {
+		currentNumber = section.GenerateIDs(currentNumber)
+	}
+}
+
+// GenerateIDs Generates ID's for the section itself, the Subsections and Fields.
+// ID's should only be used for validation of user input.
+func (w *WebFormSection) GenerateIDs(startingNumber int) int {
+	currentNumber := startingNumber
+
+	w.ID = currentNumber
+	currentNumber++
+
+	for _, section := range w.Subsections {
+		currentNumber = section.GenerateIDs(currentNumber)
+	}
+
+	for _, field := range w.Fields {
+		currentNumber = field.GenerateIDs(currentNumber)
+	}
+
+	return currentNumber
+}
+
+// GenerateIDs Generates ID's for WebFormFieldContainer and Subfields.
+func (w *WebFormFieldContainer) GenerateIDs(startingNumber int) int {
+	currentNumber := startingNumber
+	w.ID = currentNumber
+	currentNumber++
+
+	for _, field := range w.Subfields {
+		currentNumber = field.GenerateIDs(currentNumber)
+	}
+
+	return currentNumber
+}
+
+// GenerateIDs Generates the ID for the current field.
+func (w *WebFormField) GenerateIDs(startingNumber int) int {
+	w.ID = startingNumber
+	startingNumber++
+	return startingNumber
+}
