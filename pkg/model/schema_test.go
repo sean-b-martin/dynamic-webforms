@@ -24,30 +24,30 @@ func TestWebForm_GenerateIDs(t *testing.T) {
 	currentValue := 1
 	sections := form.Sections
 
-	assert.Equal(t, sections[0].ID, currentValue)
+	assert.Equal(t, currentValue, sections[0].ID)
 	currentValue++
-	assert.Equal(t, sections[1].ID, currentValue)
+	assert.Equal(t, currentValue, sections[1].ID)
 	currentValue++
 
 	// evaluate subsection 1
-	assert.Equal(t, sections[1].Subsections[0].ID, currentValue)
+	assert.Equal(t, currentValue, sections[1].Subsections[0].ID)
 	currentValue++
-	assert.Equal(t, sections[1].Subsections[0].Fields[0].ID, currentValue)
+	assert.Equal(t, currentValue, sections[1].Subsections[0].Fields[0].ID)
 	currentValue++
-	assert.Equal(t, sections[1].Subsections[0].Fields[1].ID, currentValue)
+	assert.Equal(t, currentValue, sections[1].Subsections[0].Fields[1].ID)
 	currentValue++
-	assert.Equal(t, sections[1].Subsections[0].Fields[2].ID, currentValue)
+	assert.Equal(t, currentValue, sections[1].Subsections[0].Fields[2].ID)
 	currentValue++
 
 	// evaluate complex type
-	assert.Equal(t, sections[1].Subsections[0].Fields[3].ID, currentValue)
+	assert.Equal(t, currentValue, sections[1].Subsections[0].Fields[3].ID)
 	currentValue++
-	assert.Equal(t, sections[1].Subsections[0].Fields[3].Subfields[0].ID, currentValue)
+	assert.Equal(t, currentValue, sections[1].Subsections[0].Fields[3].Subfields[0].ID)
 	currentValue++
-	assert.Equal(t, sections[1].Subsections[0].Fields[3].Subfields[1].ID, currentValue)
+	assert.Equal(t, currentValue, sections[1].Subsections[0].Fields[3].Subfields[1].ID)
 	currentValue++
 
-	assert.Equal(t, sections[1].Subsections[1].ID, currentValue)
+	assert.Equal(t, currentValue, sections[1].Subsections[1].ID)
 }
 
 func TestWebFormSection_GenerateIDs(t *testing.T) {
