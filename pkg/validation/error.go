@@ -1,8 +1,14 @@
 package validation
 
 import (
+	"errors"
 	"strconv"
 	"strings"
+)
+
+var (
+	DatatypeDuplicateError = errors.New("dynamic-forms: datatype already exists")
+	DatatypeNotFoundError  = errors.New("dynamic-forms: datatype not found")
 )
 
 type FormValidationError struct {
