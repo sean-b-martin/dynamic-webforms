@@ -92,7 +92,17 @@ func TestDatatypeRepository_GetDatatypeDefinitions(t *testing.T) {
 
 	result = repository.GetDatatypeDefinitions()
 	assert.Equal(t, len(datatypeDefinitions), len(result))
-	for i := range datatypeDefinitions {
-		assert.Equal(t, datatypeDefinitions[i], result[i])
+
+	expected := make(map[string]DatatypeDefinition)
+
+	for _, definition := range datatypeDefinitions {
+		expected[definition.Identifier] = definition
+	}
+
+	for _, definition := range result {
+		res, ok := expected[definition.Identifier]
+		assert.True(t, ok)
+		assert.NotEmpty(t, res)
+		assert.Equal(t, res, definition)
 	}
 }
