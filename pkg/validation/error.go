@@ -7,8 +7,10 @@ import (
 )
 
 var (
-	DatatypeDuplicateError = errors.New("dynamic-forms: datatype already exists")
-	DatatypeNotFoundError  = errors.New("dynamic-forms: datatype not found")
+	DatatypeDuplicateError     = errors.New("dynamic-forms: datatype already exists")
+	DatatypeNotFoundError      = errors.New("dynamic-forms: datatype not found")
+	DatatypeInvalidParentError = errors.New("dynamic-forms: invalid parent datatype")
+	DatatypeIsParentError      = errors.New("dynamic-forms: datatype is parent")
 )
 
 type FormValidationError struct {

@@ -6,6 +6,7 @@ type DatatypeDefinition struct {
 	Identifier      string `json:"identifier"`
 	DisplayName     string `json:"displayName"`
 	AllowsSubfields bool   `json:"allowsSubfields"`
+	InheritsFrom    string `json:"inheritsFrom"`
 }
 
 // Datatype contains its definition and all rules for validation TODO(add validation rules)
@@ -52,6 +53,17 @@ func (d *DatatypeRepository) AddDatatype(definition *DatatypeDefinition) error {
 		return DatatypeDuplicateError
 	}
 
+	if definition.InheritsFrom != "" {
+		parentDatatype, ok := d.datatypes[definition.InheritsFrom]
+		if !ok {
+			return DatatypeInvalidParentError
+		}
+
+		if parentDatatype.definition.AllowsSubfields != definition.AllowsSubfields {
+			return DatatypeInvalidParentError
+		}
+	}
+
 	d.datatypes[definition.Identifier] = &Datatype{definition: *definition}
 	return nil
 }
@@ -60,6 +72,16 @@ func (d *DatatypeRepository) AddDatatype(definition *DatatypeDefinition) error {
 // found. This function should only be used before starting an application or using the repository to validate data.
 func (d *DatatypeRepository) DeleteDatatype(identifier string) error {
 	if _, ok := d.datatypes[identifier]; ok {
+		for k, v := range d.datatypes {
+			if k == identifier {
+				continue
+			}
+
+			if v.definition.InheritsFrom == identifier {
+				return DatatypeIsParentError
+			}
+		}
+
 		delete(d.datatypes, identifier)
 		return nil
 	}
