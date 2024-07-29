@@ -67,7 +67,7 @@ func (f *FormValidationHelper) parseSection(schema *model.WebFormSection) {
 func (f *FormValidationHelper) getElement(id int, elementType schemaElementType) (schemaElement, error) {
 	if element, ok := f.elements[id]; ok {
 		if element.Type != elementType {
-			return schemaElement{}, ElementNotFoundError
+			return schemaElement{}, WrongElementTypeError
 		}
 
 		return element, nil

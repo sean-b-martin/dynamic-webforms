@@ -29,11 +29,11 @@ type WebFormField struct {
 
 // WebFormSubfield contains all metadata for an input field in a web form.
 type WebFormSubfield struct {
-	ID               int                     `json:"id"`
-	Title            string                  `json:"name"`
-	Type             string                  `json:"type"`
-	Description      []string                `json:"description"`
-	ValidationSchema WebFormValidationSchema `json:"validationSchema"`
+	ID               int                      `json:"id"`
+	Title            string                   `json:"name"`
+	Type             string                   `json:"type"`
+	Description      []string                 `json:"description"`
+	ValidationSchema *WebFormValidationSchema `json:"validationSchema"`
 }
 
 // WebFormValidationSchema contains validation rules that are supported by all datatypes and dynamic validation rules

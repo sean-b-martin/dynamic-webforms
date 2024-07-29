@@ -12,6 +12,7 @@ var (
 	DatatypeInvalidParentError = errors.New("dynamic-forms: invalid parent datatype")
 	DatatypeIsParentError      = errors.New("dynamic-forms: datatype is parent")
 	ElementNotFoundError       = errors.New("dynamic-forms: element not found")
+	WrongElementTypeError      = errors.New("dynamic-forms: wrong element type")
 )
 
 type FormValidationError struct {
