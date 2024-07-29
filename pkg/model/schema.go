@@ -12,28 +12,28 @@ type WebFormSchema struct {
 // WebFormSection contains 0 to n subsections and 0 to n fields. ResourceLinks are only used in the frontend to load
 // resources like files and images.
 type WebFormSection struct {
-	ID            int                      `json:"id"`
-	Title         string                   `json:"name"`
-	Description   []string                 `json:"description"`
-	ResourceLinks []string                 `json:"resourceLinks"`
-	Subsections   []*WebFormSection        `json:"subsections"`
-	Fields        []*WebFormFieldContainer `json:"fields"`
+	ID            int               `json:"id"`
+	Title         string            `json:"name"`
+	Description   []string          `json:"description"`
+	ResourceLinks []string          `json:"resourceLinks"`
+	Subsections   []*WebFormSection `json:"subsections"`
+	Fields        []*WebFormField   `json:"fields"`
 }
 
-// WebFormFieldContainer contains a WebFormField and 0 to n Subfields. An example for Subfields are table columns.
+// WebFormField is a WebFormSubfield with optional 0 to n Subfields. An example for Subfields are table columns.
 // Normal fields like textboxes do not allow the use of Subfields.
-type WebFormFieldContainer struct {
-	*WebFormField
-	Subfields []*WebFormField `json:"subfields"`
+type WebFormField struct {
+	*WebFormSubfield
+	Subfields []*WebFormSubfield `json:"subfields"`
 }
 
-// WebFormField contains all metadata for an input field in a web form.
-type WebFormField struct {
-	ID               int                     `json:"id"`
-	Title            string                  `json:"name"`
-	Type             string                  `json:"type"`
-	Description      []string                `json:"description"`
-	ValidationSchema WebFormValidationSchema `json:"validationSchema"`
+// WebFormSubfield contains all metadata for an input field in a web form.
+type WebFormSubfield struct {
+	ID               int                      `json:"id"`
+	Title            string                   `json:"name"`
+	Type             string                   `json:"type"`
+	Description      []string                 `json:"description"`
+	ValidationSchema *WebFormValidationSchema `json:"validationSchema"`
 }
 
 // WebFormValidationSchema contains validation rules that are supported by all datatypes and dynamic validation rules
@@ -77,8 +77,8 @@ func (w *WebFormSection) GenerateIDs(startingNumber int) int {
 	return currentNumber
 }
 
-// GenerateIDs Generates ID's for WebFormFieldContainer and Subfields.
-func (w *WebFormFieldContainer) GenerateIDs(startingNumber int) int {
+// GenerateIDs Generates ID's for WebFormField and Subfields.
+func (w *WebFormField) GenerateIDs(startingNumber int) int {
 	currentNumber := startingNumber
 	w.ID = currentNumber
 	currentNumber++
@@ -91,7 +91,7 @@ func (w *WebFormFieldContainer) GenerateIDs(startingNumber int) int {
 }
 
 // GenerateIDs Generates the ID for the current field.
-func (w *WebFormField) GenerateIDs(startingNumber int) int {
+func (w *WebFormSubfield) GenerateIDs(startingNumber int) int {
 	w.ID = startingNumber
 	startingNumber++
 	return startingNumber

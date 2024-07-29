@@ -12,6 +12,7 @@ type DatatypeDefinition struct {
 // Datatype contains its definition and all rules for validation TODO(add validation rules)
 type Datatype struct {
 	definition DatatypeDefinition
+	DatatypeValidator
 }
 
 // DatatypeRepository contains the available datatypes.
@@ -19,8 +20,8 @@ type DatatypeRepository struct {
 	datatypes map[string]*Datatype
 }
 
-func NewDatatype(definition DatatypeDefinition) Datatype {
-	return Datatype{definition: definition}
+func NewDatatype(definition DatatypeDefinition, validator DatatypeValidator) Datatype {
+	return Datatype{definition: definition, DatatypeValidator: validator}
 }
 
 func NewDatatypeRepository() DatatypeRepository {

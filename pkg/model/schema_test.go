@@ -12,13 +12,13 @@ func TestWebForm_GenerateIDs(t *testing.T) {
 		&WebFormSection{Title: "Subsection2"})
 
 	form.Sections[1].Subsections[0].Fields = append(form.Sections[1].Subsections[0].Fields,
-		&WebFormFieldContainer{WebFormField: &WebFormField{Title: "Field1"}},
-		&WebFormFieldContainer{WebFormField: &WebFormField{Title: "Field2"}},
-		&WebFormFieldContainer{WebFormField: &WebFormField{Title: "Field3"}},
-		&WebFormFieldContainer{WebFormField: &WebFormField{Title: "Field4"}, Subfields: make([]*WebFormField, 0)})
+		&WebFormField{WebFormSubfield: &WebFormSubfield{Title: "Field1"}},
+		&WebFormField{WebFormSubfield: &WebFormSubfield{Title: "Field2"}},
+		&WebFormField{WebFormSubfield: &WebFormSubfield{Title: "Field3"}},
+		&WebFormField{WebFormSubfield: &WebFormSubfield{Title: "Field4"}, Subfields: make([]*WebFormSubfield, 0)})
 
 	form.Sections[1].Subsections[0].Fields[3].Subfields = append(form.Sections[1].Subsections[0].Fields[3].Subfields,
-		&WebFormField{Title: "Column1"}, &WebFormField{Title: "Column2"})
+		&WebFormSubfield{Title: "Column1"}, &WebFormSubfield{Title: "Column2"})
 
 	form.GenerateIDs()
 	currentValue := 1
@@ -62,8 +62,8 @@ func TestWebFormSection_GenerateIDs(t *testing.T) {
 }
 
 func TestWebFormFieldContainer_GenerateIDs(t *testing.T) {
-	field := WebFormFieldContainer{WebFormField: &WebFormField{}, Subfields: make([]*WebFormField, 0)}
-	field.Subfields = append(field.Subfields, &WebFormField{Title: "Column1"}, &WebFormField{Title: "Column2"})
+	field := WebFormField{WebFormSubfield: &WebFormSubfield{}, Subfields: make([]*WebFormSubfield, 0)}
+	field.Subfields = append(field.Subfields, &WebFormSubfield{Title: "Column1"}, &WebFormSubfield{Title: "Column2"})
 
 	field.GenerateIDs(0)
 	assert.Equal(t, 0, field.ID)
@@ -72,7 +72,7 @@ func TestWebFormFieldContainer_GenerateIDs(t *testing.T) {
 }
 
 func TestWebFormField_GenerateIDs(t *testing.T) {
-	field := WebFormField{}
+	field := WebFormSubfield{}
 	field.GenerateIDs(0)
 	assert.Equal(t, 0, field.ID)
 
