@@ -9,7 +9,7 @@ type DatatypeDefinition struct {
 	InheritsFrom    string `json:"inheritsFrom"`
 }
 
-// Datatype contains its definition and all rules for validation TODO(add validation rules)
+// Datatype contains its definition and all rules for validation
 type Datatype struct {
 	definition DatatypeDefinition
 	DatatypeValidator
