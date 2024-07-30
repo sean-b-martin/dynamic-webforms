@@ -29,15 +29,15 @@ func NewFormValidationHelper() *FormValidationHelper {
 	}
 }
 
-func (f *FormValidationHelper) ParseForm(schema *model.WebFormSchema) []FormValidationError {
+func (f *FormValidationHelper) ParseForm(schema *model.WebFormSchema, maxRecursion int) []FormValidationError {
 	for _, section := range schema.Sections {
-		f.parseSection(section)
+		f.parseSection(section, maxRecursion)
 	}
 
 	return f.errors
 }
 
-func (f *FormValidationHelper) parseSection(schema *model.WebFormSection) {
+func (f *FormValidationHelper) parseSection(schema *model.WebFormSection, maxRecursion int) {
 	if _, ok := f.elements[schema.ID]; ok {
 		f.errors = append(f.errors, NewSchemaError(schema.ID, "duplicate element id"))
 	}
@@ -45,7 +45,11 @@ func (f *FormValidationHelper) parseSection(schema *model.WebFormSection) {
 	f.elements[schema.ID] = schemaElement{SECTION, schema}
 
 	for _, subsection := range schema.Subsections {
-		f.parseSection(subsection)
+		if maxRecursion == 0 {
+			f.errors = append(f.errors, NewSchemaError(schema.ID, "too many subsection levels"))
+		} else {
+			f.parseSection(subsection, maxRecursion-1)
+		}
 	}
 
 	for _, field := range schema.Fields {

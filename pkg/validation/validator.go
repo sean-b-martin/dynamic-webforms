@@ -22,7 +22,7 @@ func (f *FormValidator) ValidateSchema(schema *model.WebFormSchema) []FormValida
 	helper := NewFormValidationHelper()
 
 	// return if duplicate ids in schema
-	if err := helper.ParseForm(schema); err != nil {
+	if err := helper.ParseForm(schema, 5); err != nil {
 		return err
 	}
 
@@ -59,7 +59,7 @@ func (f *FormValidator) ValidateData(values []*model.WebFormDataRaw, schema *mod
 
 	// stop validation if duplicate id's exist
 	// only possible if schema was not validated using FormValidator.ValidateSchema(schema)
-	if err := helper.ParseForm(schema); err != nil {
+	if err := helper.ParseForm(schema, 5); err != nil {
 		errs := make([]FormValidationError, 0, len(err)+1)
 		errs = append(errs, NewSchemaError(-1, "form schema is invalid"))
 		errs = append(errs, err...)
