@@ -58,11 +58,20 @@ func (v numberTypeValidator[T]) ValidateData(data *model.WebFormDataRaw, id int,
 		return []FormValidationError{NewSchemaError(id, err.Error())}
 	}
 
-	var values []T
+	values := make([]T, len(data.Data))
+	schemaErrors := make([]FormValidationError, 0)
 
-	if err := json.Unmarshal(schema.DynamicConstraints, &values); err != nil {
+	for i, v := range data.Data {
+		var value T
 		// TODO cast strings to T if possible so "1" is also valid
-		return []FormValidationError{NewSchemaError(id, "data does not contain valid values")}
+		if err := json.Unmarshal(v, &value); err != nil {
+			schemaErrors = append(schemaErrors, NewSchemaErrorWithIndex(id, i, err.Error()))
+		}
+		values[i] = value
+	}
+
+	if values != nil {
+		return schemaErrors
 	}
 
 	validationErrors := make([]FormValidationError, 0)
