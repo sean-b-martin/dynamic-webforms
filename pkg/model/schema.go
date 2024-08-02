@@ -40,7 +40,7 @@ type WebFormSubfield struct {
 // that are only available to some datatypes.
 type WebFormValidationSchema struct {
 	BasicConstraints
-	DynamicConstraints map[string]json.RawMessage `json:"dynamicConstraints"`
+	DynamicConstraints json.RawMessage `json:"dynamicConstraints"`
 }
 
 // BasicConstraints contains all attributes for validation that are used for any datatype.
