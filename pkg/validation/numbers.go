@@ -78,19 +78,19 @@ func (v numberTypeValidator[T]) ValidateData(data *model.WebFormDataRaw, id int,
 
 	for i, value := range values {
 		if dynamicConstraints.Lt != nil && *dynamicConstraints.Lt >= value {
-			validationErrors = append(validationErrors, NewDataErrorWithIndex(id, i, "value not <"+fmt.Sprintf("%v", *dynamicConstraints.Lt)))
+			validationErrors = append(validationErrors, NewDataErrorWithIndex(id, i, "value not less than "+fmt.Sprintf("%v", *dynamicConstraints.Lt)))
 		}
 
 		if dynamicConstraints.Gt != nil && *dynamicConstraints.Gt <= value {
-			validationErrors = append(validationErrors, NewDataErrorWithIndex(id, i, "value not >"+fmt.Sprintf("%v", *dynamicConstraints.Gt)))
+			validationErrors = append(validationErrors, NewDataErrorWithIndex(id, i, "value not greater than "+fmt.Sprintf("%v", *dynamicConstraints.Gt)))
 		}
 
 		if dynamicConstraints.Lte != nil && *dynamicConstraints.Lte <= value {
-			validationErrors = append(validationErrors, NewDataErrorWithIndex(id, i, "value not <="+fmt.Sprintf("%v", *dynamicConstraints.Lte)))
+			validationErrors = append(validationErrors, NewDataErrorWithIndex(id, i, "value not less or equal than "+fmt.Sprintf("%v", *dynamicConstraints.Lte)))
 		}
 
 		if dynamicConstraints.Gte != nil && *dynamicConstraints.Gte <= value {
-			validationErrors = append(validationErrors, NewDataErrorWithIndex(id, i, "value not >="+fmt.Sprintf("%v", *dynamicConstraints.Gte)))
+			validationErrors = append(validationErrors, NewDataErrorWithIndex(id, i, "value not greater or equal than "+fmt.Sprintf("%v", *dynamicConstraints.Gte)))
 		}
 
 		valueStr := fmt.Sprintf("%v", value)
