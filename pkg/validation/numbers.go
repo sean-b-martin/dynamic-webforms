@@ -7,25 +7,57 @@ import (
 	"math/big"
 )
 
-var DefaultIntNumberType = Datatype{
-	definition: DatatypeDefinition{
-		Identifier:      "@default/int64",
-		DisplayName:     "int64",
-		AllowsSubfields: false,
-		InheritsFrom:    "",
-	},
-	DatatypeValidator: numberTypeValidator[int64]{},
-}
+var (
+	DefaultIntNumberType = Datatype{
+		definition: DatatypeDefinition{
+			Identifier:      "@default/int64",
+			DisplayName:     "int64",
+			AllowsSubfields: false,
+			InheritsFrom:    "",
+		},
+		DatatypeValidator: numberTypeValidator[int64]{},
+	}
+
+	DefaultFloatNumberType = Datatype{
+		definition: DatatypeDefinition{
+			Identifier:      "@default/float64",
+			DisplayName:     "float64",
+			AllowsSubfields: false,
+			InheritsFrom:    "",
+		},
+		DatatypeValidator: numberTypeValidator[float64]{},
+	}
+
+	DefaultBigIntNumberType = Datatype{
+		definition: DatatypeDefinition{
+			Identifier:      "@default/large_int",
+			DisplayName:     "large int",
+			AllowsSubfields: false,
+			InheritsFrom:    "",
+		},
+		DatatypeValidator: bigNumberTypeValidator[big.Int]{},
+	}
+
+	DefaultBigFloatNumberType = Datatype{
+		definition: DatatypeDefinition{
+			Identifier:      "@default/large_float",
+			DisplayName:     "large float",
+			AllowsSubfields: false,
+			InheritsFrom:    "",
+		},
+		DatatypeValidator: nil,
+	}
+)
 
 type Numbers interface {
 	int64 | int | float64
 }
 
-type LargeNumbers interface {
+type BigNumbers interface {
 	big.Int | big.Float
 }
 
-type DynamicNumberValidation[T Numbers | LargeNumbers] struct {
+type DynamicNumberValidation[T Numbers | BigNumbers] struct {
 	Lt        *T   `json:"lt,omitempty"`
 	Gt        *T   `json:"gt,omitempty"`
 	Lte       *T   `json:"lte,omitempty"`
@@ -34,8 +66,7 @@ type DynamicNumberValidation[T Numbers | LargeNumbers] struct {
 	MaxDigits *int `json:"maxDigits,omitempty"`
 }
 
-type numberTypeValidator[T Numbers] struct {
-}
+type numberTypeValidator[T Numbers] struct{}
 
 func (v numberTypeValidator[T]) ValidateSchema(schema *model.WebFormField) []FormValidationError {
 	errors := make([]FormValidationError, 0)
@@ -104,4 +135,25 @@ func (v numberTypeValidator[T]) ValidateData(data *model.WebFormDataRaw, id int,
 	}
 
 	return validationErrors
+}
+
+type bigNumberTypeValidator[T BigNumbers] struct{}
+
+func (b bigNumberTypeValidator[T]) ValidateSchema(schema *model.WebFormField) []FormValidationError {
+	errors := make([]FormValidationError, 0)
+	var dynamicConstraints DynamicNumberValidation[T]
+
+	err := json.Unmarshal(schema.ValidationSchema.DynamicConstraints, &dynamicConstraints)
+	if err != nil {
+		errors = append(errors, NewSchemaError(schema.ID, err.Error()))
+	}
+
+	// TODO add validation for values, for example Lt must be < than Gt
+
+	return errors
+}
+
+func (b bigNumberTypeValidator[T]) ValidateData(data *model.WebFormDataRaw, id int, schema *model.WebFormValidationSchema) []FormValidationError {
+	//TODO implement me
+	panic("implement me")
 }
