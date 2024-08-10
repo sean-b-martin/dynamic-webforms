@@ -7,7 +7,7 @@ import (
 
 type DatatypeValidator interface {
 	ValidateSchema(schema *model.WebFormField) []FormValidationError
-	ValidateData(data *model.WebFormDataRaw, id int, schema *model.WebFormValidationSchema) []FormValidationError
+	ValidateData(data *model.WebFormDataRaw, schema *model.WebFormValidationSchema) []FormValidationError
 }
 
 type FormValidator struct {
@@ -86,9 +86,21 @@ func (f *FormValidator) ValidateData(values []*model.WebFormDataRaw, schema *mod
 			continue
 		}
 
-		validationErrors = append(validationErrors, datatype.ValidateData(value, subfield.ID, subfield.ValidationSchema)...)
+		validationErrors = append(validationErrors, datatype.ValidateData(value, subfield.ValidationSchema)...)
 
 	}
 
 	return validationErrors
+}
+
+type AllowsSubfieldsValidator struct {
+	AllowsSubfield bool
+}
+
+func (a *AllowsSubfieldsValidator) Validate(schema *model.WebFormField) []FormValidationError {
+	if !a.AllowsSubfield && (schema.Subfields != nil || len(schema.Subfields) > 0) {
+		return []FormValidationError{NewSchemaError(schema.ID, "subfields are not allowed to be set in schema")}
+	}
+
+	return nil
 }

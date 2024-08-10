@@ -42,7 +42,9 @@ func (f FormValidationError) Error() string {
 	sb := strings.Builder{}
 	sb.WriteString("form-validation: ")
 	sb.WriteString(f.Name)
+	sb.WriteString(" ")
 	sb.WriteString(strconv.Itoa(f.SchemaElementID))
+	sb.WriteString(" ")
 	sb.WriteString(f.Message)
 	return sb.String()
 }
