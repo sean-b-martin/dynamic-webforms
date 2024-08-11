@@ -68,7 +68,7 @@ type DynamicNumberValidationSchema[T Numbers | BigNumbers] struct {
 }
 
 type numberTypeValidator[T Numbers] struct {
-	AllowsSubfieldsValidator
+	allowsSubfieldsValidator AllowsSubfieldsValidator
 }
 
 func (v numberTypeValidator[T]) ValidateSchema(schema *model.WebFormField) []FormValidationError {
@@ -82,7 +82,7 @@ func (v numberTypeValidator[T]) ValidateSchema(schema *model.WebFormField) []For
 		}
 	}
 
-	errors = append(errors, v.AllowsSubfieldsValidator.Validate(schema)...)
+	errors = append(errors, v.allowsSubfieldsValidator.Validate(schema)...)
 
 	// TODO add validation for values, for example Lt must be < than Gt
 
@@ -145,7 +145,7 @@ func (v numberTypeValidator[T]) ValidateData(data *model.WebFormDataRaw, schema 
 }
 
 type bigNumberTypeValidator[T BigNumbers] struct {
-	AllowsSubfieldsValidator
+	allowsSubfieldsValidator AllowsSubfieldsValidator
 }
 
 func (b bigNumberTypeValidator[T]) ValidateSchema(schema *model.WebFormField) []FormValidationError {
@@ -159,7 +159,7 @@ func (b bigNumberTypeValidator[T]) ValidateSchema(schema *model.WebFormField) []
 		}
 	}
 
-	errors = append(errors, b.AllowsSubfieldsValidator.Validate(schema)...)
+	errors = append(errors, b.allowsSubfieldsValidator.Validate(schema)...)
 	// TODO add validation for values, for example Lt must be < than Gt
 
 	return errors
