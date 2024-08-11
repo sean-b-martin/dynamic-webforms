@@ -136,9 +136,9 @@ func Test_numberTypeValidator_ValidateSchema(t *testing.T) {
 	dynamicConstraints := make(map[string]interface{})
 
 	field.ValidationSchema.DynamicConstraints, _ = json.Marshal(DynamicNumberValidationSchema[int]{
-		Lt:        initPointer(1),
+		Lt:        initPointer(2),
 		Gt:        initPointer(1),
-		Lte:       initPointer(1),
+		Lte:       initPointer(2),
 		Gte:       initPointer(1),
 		MinDigits: initPointer(1),
 		MaxDigits: initPointer(1),
@@ -155,6 +155,62 @@ func Test_numberTypeValidator_ValidateSchema(t *testing.T) {
 	// wrong type
 	dynamicConstraints["lt"] = "hello"
 	field.ValidationSchema.DynamicConstraints, _ = json.Marshal(dynamicConstraints)
+	assert.NotEmpty(t, validator.ValidateSchema(field))
+
+	// gt > lt
+	field.ValidationSchema.DynamicConstraints, _ = json.Marshal(DynamicNumberValidationSchema[int]{
+		Lt: initPointer(1),
+		Gt: initPointer(2),
+	})
+	assert.NotEmpty(t, validator.ValidateSchema(field))
+
+	// gt == lt
+	field.ValidationSchema.DynamicConstraints, _ = json.Marshal(DynamicNumberValidationSchema[int]{
+		Lt: initPointer(1),
+		Gt: initPointer(1),
+	})
+	assert.NotEmpty(t, validator.ValidateSchema(field))
+
+	// gte > lt
+	field.ValidationSchema.DynamicConstraints, _ = json.Marshal(DynamicNumberValidationSchema[int]{
+		Lt:  initPointer(1),
+		Gte: initPointer(2),
+	})
+	assert.NotEmpty(t, validator.ValidateSchema(field))
+
+	// gte == lt
+	field.ValidationSchema.DynamicConstraints, _ = json.Marshal(DynamicNumberValidationSchema[int]{
+		Lt:  initPointer(1),
+		Gte: initPointer(1),
+	})
+	assert.NotEmpty(t, validator.ValidateSchema(field))
+
+	// lte == gt
+	field.ValidationSchema.DynamicConstraints, _ = json.Marshal(DynamicNumberValidationSchema[int]{
+		Lte: initPointer(1),
+		Gt:  initPointer(1),
+	})
+	assert.NotEmpty(t, validator.ValidateSchema(field))
+
+	// lte < gt
+	field.ValidationSchema.DynamicConstraints, _ = json.Marshal(DynamicNumberValidationSchema[int]{
+		Lte: initPointer(1),
+		Gt:  initPointer(2),
+	})
+	assert.NotEmpty(t, validator.ValidateSchema(field))
+
+	// lte == gte
+	field.ValidationSchema.DynamicConstraints, _ = json.Marshal(DynamicNumberValidationSchema[int]{
+		Lte: initPointer(2),
+		Gte: initPointer(2),
+	})
+	assert.Empty(t, validator.ValidateSchema(field))
+
+	// lte < gte
+	field.ValidationSchema.DynamicConstraints, _ = json.Marshal(DynamicNumberValidationSchema[int]{
+		Lte: initPointer(1),
+		Gte: initPointer(2),
+	})
 	assert.NotEmpty(t, validator.ValidateSchema(field))
 }
 

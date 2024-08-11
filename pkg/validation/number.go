@@ -74,8 +74,8 @@ type numberTypeValidator[T Numbers] struct {
 func (v numberTypeValidator[T]) ValidateSchema(schema *model.WebFormField) []FormValidationError {
 	errors := make([]FormValidationError, 0)
 
+	var dynamicConstraints DynamicNumberValidationSchema[T]
 	if schema.ValidationSchema.DynamicConstraints != nil {
-		var dynamicConstraints DynamicNumberValidationSchema[T]
 		err := json.Unmarshal(schema.ValidationSchema.DynamicConstraints, &dynamicConstraints)
 		if err != nil {
 			errors = append(errors, NewSchemaError(schema.ID, err.Error()))
@@ -84,7 +84,33 @@ func (v numberTypeValidator[T]) ValidateSchema(schema *model.WebFormField) []For
 
 	errors = append(errors, v.allowsSubfieldsValidator.Validate(schema)...)
 
-	// TODO add validation for values, for example Lt must be < than Gt
+	if dynamicConstraints.Lt != nil {
+		if dynamicConstraints.Gt != nil && *dynamicConstraints.Lt <= *dynamicConstraints.Gt {
+			errors = append(errors, NewDataError(schema.ID, "lt must be greater than gt"))
+		}
+		if dynamicConstraints.Gte != nil && *dynamicConstraints.Lt <= *dynamicConstraints.Gte {
+			errors = append(errors, NewDataError(schema.ID, "lt must be greater than gte"))
+		}
+	}
+
+	if dynamicConstraints.Lte != nil {
+		if dynamicConstraints.Gt != nil && *dynamicConstraints.Lte <= *dynamicConstraints.Gt {
+			errors = append(errors, NewDataError(schema.ID, "lte must be greater than gt"))
+		}
+		if dynamicConstraints.Gte != nil && *dynamicConstraints.Lte < *dynamicConstraints.Gte {
+			errors = append(errors, NewDataError(schema.ID, "lte must be greater than or equal gte"))
+		}
+	}
+
+	if dynamicConstraints.MinDigits != nil {
+		if dynamicConstraints.MaxDigits != nil && *dynamicConstraints.MaxDigits < *dynamicConstraints.MinDigits {
+			errors = append(errors, NewDataError(schema.ID, "minDigits must be greater than maxDigits"))
+		}
+	}
+
+	if dynamicConstraints.MaxDigits != nil && *dynamicConstraints.MaxDigits <= 0 {
+		errors = append(errors, NewDataError(schema.ID, "maxDigits must be greater than 0"))
+	}
 
 	return errors
 }
