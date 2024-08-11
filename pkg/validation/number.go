@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/sean-b-martin/dynamic-webforms/pkg/model"
 	"math/big"
+	"strings"
 )
 
 var (
@@ -101,7 +102,6 @@ func (v numberTypeValidator[T]) ValidateData(data *model.WebFormDataRaw, schema 
 
 	for i, v := range data.Data {
 		var value T
-		// TODO cast strings to T if possible so "1" is also valid
 		if err := json.Unmarshal(v, &value); err != nil {
 			schemaErrors = append(schemaErrors, NewSchemaErrorWithIndex(id, i, err.Error()))
 		}
@@ -131,7 +131,7 @@ func (v numberTypeValidator[T]) ValidateData(data *model.WebFormDataRaw, schema 
 			validationErrors = append(validationErrors, NewDataErrorWithIndex(id, i, "value not greater or equal than "+fmt.Sprintf("%v", *dynamicConstraints.Gte)))
 		}
 
-		valueStr := fmt.Sprintf("%v", value)
+		valueStr := strings.Split(fmt.Sprintf("%v", value), ".")[0]
 		if dynamicConstraints.MinDigits != nil && *dynamicConstraints.MinDigits > len(valueStr) {
 			validationErrors = append(validationErrors, NewDataErrorWithIndex(id, i, "value has less digits than "+fmt.Sprintf("%v", *dynamicConstraints.MinDigits)))
 		}

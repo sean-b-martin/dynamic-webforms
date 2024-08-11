@@ -88,6 +88,33 @@ func Test_numberTypeValidator_ValidateData(t *testing.T) {
 	// len(data) > MaxDigits
 	data.Data[0] = json.RawMessage(`1000`)
 	assert.NotEmpty(t, validator.ValidateData(data, validationSchema))
+
+	// MinDigits / MaxDigits for float64
+	floatValidator := numberTypeValidator[float64]{}
+	floatConstraints := DynamicNumberValidationSchema[float64]{
+		MinDigits: initPointer(2),
+		MaxDigits: initPointer(4),
+	}
+
+	validationSchema.DynamicConstraints, _ = json.Marshal(&floatConstraints)
+
+	data.Data[0] = json.RawMessage(`1.11`)
+	assert.NotEmpty(t, floatValidator.ValidateData(data, validationSchema))
+
+	data.Data[0] = json.RawMessage(`1.11111`)
+	assert.NotEmpty(t, floatValidator.ValidateData(data, validationSchema))
+
+	data.Data[0] = json.RawMessage(`10.11`)
+	assert.Empty(t, floatValidator.ValidateData(data, validationSchema))
+
+	data.Data[0] = json.RawMessage(`100.11`)
+	assert.Empty(t, floatValidator.ValidateData(data, validationSchema))
+
+	data.Data[0] = json.RawMessage(`1000.11`)
+	assert.Empty(t, floatValidator.ValidateData(data, validationSchema))
+
+	data.Data[0] = json.RawMessage(`10000.11`)
+	assert.NotEmpty(t, floatValidator.ValidateData(data, validationSchema))
 }
 
 func Test_numberTypeValidator_ValidateSchema(t *testing.T) {
