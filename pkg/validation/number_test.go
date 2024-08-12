@@ -214,14 +214,6 @@ func Test_numberTypeValidator_ValidateSchema(t *testing.T) {
 	assert.NotEmpty(t, validator.ValidateSchema(field))
 }
 
-func Test_bigNumberTypeValidator_ValidateData(t *testing.T) {
-
-}
-
-func Test_bigNumberTypeValidator_ValidateSchema(t *testing.T) {
-
-}
-
-func initPointer[T Numbers](value T) *T {
+func initPointer[T Number](value T) *T {
 	return &value
 }
