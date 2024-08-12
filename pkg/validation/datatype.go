@@ -15,7 +15,7 @@ type Datatype struct {
 	DatatypeValidator
 }
 
-// DatatypeRepository contains the available datatypes.
+// DatatypeRepository contains the available expectedDatatypes.
 type DatatypeRepository struct {
 	datatypes map[string]*Datatype
 }
@@ -26,6 +26,19 @@ func NewDatatype(definition DatatypeDefinition, validator DatatypeValidator) Dat
 
 func NewDatatypeRepository() DatatypeRepository {
 	return DatatypeRepository{datatypes: make(map[string]*Datatype)}
+}
+
+func AddDefaultDatatypes(repository DatatypeRepository) (DatatypeRepository, error) {
+	defaultDatatypes := []*Datatype{&DefaultIntNumberType, &DefaultFloatNumberType}
+
+	for _, datatype := range defaultDatatypes {
+		err := repository.AddDatatype(datatype)
+		if err != nil {
+			return repository, err
+		}
+	}
+
+	return repository, nil
 }
 
 // GetDatatypeDefinitions returns a slice of all DatatypeDefinition available inside the repository
@@ -51,23 +64,23 @@ func (d *DatatypeRepository) GetDatatype(identifier string) (*Datatype, error) {
 // AddDatatype returns nil if successful and DatatypeDuplicateError when DatatypeDefinition.Identifier is already used.
 // returns DatatypeInvalidParentError when using DatatypeDefinition.InheritsFrom if parent datatype does not exist or
 // the parent datatype has a different value for DatatypeDefinition.AllowsSubfields
-func (d *DatatypeRepository) AddDatatype(definition *DatatypeDefinition) error {
-	if _, ok := d.datatypes[definition.Identifier]; ok {
+func (d *DatatypeRepository) AddDatatype(datatype *Datatype) error {
+	if _, ok := d.datatypes[datatype.definition.Identifier]; ok {
 		return DatatypeDuplicateError
 	}
 
-	if definition.InheritsFrom != "" {
-		parentDatatype, ok := d.datatypes[definition.InheritsFrom]
+	if datatype.definition.InheritsFrom != "" {
+		parentDatatype, ok := d.datatypes[datatype.definition.InheritsFrom]
 		if !ok {
 			return DatatypeInvalidParentError
 		}
 
-		if parentDatatype.definition.AllowsSubfields != definition.AllowsSubfields {
+		if parentDatatype.definition.AllowsSubfields != datatype.definition.AllowsSubfields {
 			return DatatypeInvalidParentError
 		}
 	}
 
-	d.datatypes[definition.Identifier] = &Datatype{definition: *definition}
+	d.datatypes[datatype.definition.Identifier] = datatype
 	return nil
 }
 
