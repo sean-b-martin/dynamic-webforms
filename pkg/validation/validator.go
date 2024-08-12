@@ -11,11 +11,12 @@ type DatatypeValidator interface {
 }
 
 type FormValidator struct {
-	datatypeRepository *DatatypeRepository
+	datatypeRepository        *DatatypeRepository
+	basicConstraintsValidator BasicConstraintsValidator
 }
 
-func NewFormValidator(repository *DatatypeRepository) *FormValidator {
-	return &FormValidator{datatypeRepository: repository}
+func NewFormValidator(repository *DatatypeRepository, basicConstraintsValidator BasicConstraintsValidator) *FormValidator {
+	return &FormValidator{datatypeRepository: repository, basicConstraintsValidator: basicConstraintsValidator}
 }
 
 func (f *FormValidator) ValidateSchema(schema *model.WebFormSchema) []FormValidationError {
@@ -48,6 +49,7 @@ func (f *FormValidator) validateSchemaSection(schema *model.WebFormSection) []Fo
 			continue
 		}
 
+		schemaErrors = append(schemaErrors, f.basicConstraintsValidator.ValidateBasicConstraintsSchema(field)...)
 		schemaErrors = append(schemaErrors, datatype.ValidateSchema(field)...)
 	}
 
@@ -86,6 +88,10 @@ func (f *FormValidator) ValidateData(values []*model.WebFormDataRaw, schema *mod
 			continue
 		}
 
+		// basic validation
+		validationErrors = append(validationErrors, f.basicConstraintsValidator.ValidateBasicConstraints(value, &subfield.ValidationSchema.BasicConstraints)...)
+
+		// dynamic validation
 		validationErrors = append(validationErrors, datatype.ValidateData(value, subfield.ValidationSchema)...)
 
 	}
