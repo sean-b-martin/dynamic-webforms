@@ -13,7 +13,7 @@ func NewBasicConstraintsValidator(defaultMaxItems int) BasicConstraintsValidator
 	return BasicConstraintsValidator{defaultMaxItems: defaultMaxItems}
 }
 
-func (b BasicConstraintsValidator) ValidateBasicConstraintsSchema(schema *model.WebFormField) []FormValidationError {
+func (b BasicConstraintsValidator) ValidateSchema(schema *model.WebFormField) []FormValidationError {
 	errs := make([]FormValidationError, 0)
 
 	fields := make([]*model.WebFormSubfield, 0, 1+len(schema.Subfields))
@@ -35,7 +35,7 @@ func (b BasicConstraintsValidator) ValidateBasicConstraintsSchema(schema *model.
 	return errs
 }
 
-func (b BasicConstraintsValidator) ValidateBasicConstraints(data *model.WebFormDataRaw, schema *model.BasicConstraints) []FormValidationError {
+func (b BasicConstraintsValidator) ValidateData(data *model.WebFormDataRaw, schema *model.BasicConstraints) []FormValidationError {
 	return b.validateItemCount(data, schema)
 }
 
@@ -52,7 +52,7 @@ func (b BasicConstraintsValidator) validateItemCount(data *model.WebFormDataRaw,
 	}
 
 	if maxItems != nil && *maxItems < len(data.Data) {
-		errs = append(errs, NewDataError(data.SchemaElementID, "amount of data too high, maximum allowed "+strconv.Itoa(*schema.MaxItems)))
+		errs = append(errs, NewDataError(data.SchemaElementID, "amount of data too high, maximum allowed "+strconv.Itoa(*maxItems)))
 	}
 
 	return errs

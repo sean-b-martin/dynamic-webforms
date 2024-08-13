@@ -49,7 +49,7 @@ func (f *FormValidator) validateSchemaSection(schema *model.WebFormSection) []Fo
 			continue
 		}
 
-		schemaErrors = append(schemaErrors, f.basicConstraintsValidator.ValidateBasicConstraintsSchema(field)...)
+		schemaErrors = append(schemaErrors, f.basicConstraintsValidator.ValidateSchema(field)...)
 		schemaErrors = append(schemaErrors, datatype.ValidateSchema(field)...)
 	}
 
@@ -89,7 +89,7 @@ func (f *FormValidator) ValidateData(values []*model.WebFormDataRaw, schema *mod
 		}
 
 		// basic validation
-		validationErrors = append(validationErrors, f.basicConstraintsValidator.ValidateBasicConstraints(value, &subfield.ValidationSchema.BasicConstraints)...)
+		validationErrors = append(validationErrors, f.basicConstraintsValidator.ValidateData(value, &subfield.ValidationSchema.BasicConstraints)...)
 
 		// dynamic validation
 		validationErrors = append(validationErrors, datatype.ValidateData(value, subfield.ValidationSchema)...)
