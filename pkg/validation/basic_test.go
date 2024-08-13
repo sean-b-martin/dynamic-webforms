@@ -12,11 +12,66 @@ func TestNewBasicConstraintsValidator(t *testing.T) {
 }
 
 func TestBasicConstraintsValidator_ValidateData(t *testing.T) {
+	validator := NewBasicConstraintsValidator(1)
+	basicConstraints := model.BasicConstraints{
+		MinItems: initPointer(0),
+		MaxItems: initPointer(2),
+	}
 
+	data := &model.WebFormDataRaw{
+		SchemaElementID: 0,
+		Data:            nil,
+	}
+
+	assert.Empty(t, validator.ValidateData(data, &basicConstraints))
+
+	data.Data = []json.RawMessage{json.RawMessage(`1`), json.RawMessage(`2`), json.RawMessage(`3`)}
+	assert.NotEmpty(t, validator.ValidateData(data, &basicConstraints))
 }
 
 func TestBasicConstraintsValidator_ValidateSchema(t *testing.T) {
+	validator := NewBasicConstraintsValidator(1)
 
+	field := &model.WebFormField{
+		WebFormSubfield: &model.WebFormSubfield{
+			ID:          0,
+			Title:       "",
+			Type:        "",
+			Description: nil,
+			ValidationSchema: &model.WebFormValidationSchema{
+				BasicConstraints: model.BasicConstraints{},
+			},
+		},
+		Subfields: []*model.WebFormSubfield{
+			{
+				ID:          0,
+				Title:       "",
+				Type:        "",
+				Description: nil,
+				ValidationSchema: &model.WebFormValidationSchema{
+					BasicConstraints: model.BasicConstraints{},
+				},
+			},
+		},
+	}
+
+	assert.Empty(t, validator.ValidateSchema(field))
+
+	field.ValidationSchema.BasicConstraints.MaxItems = initPointer(-1)
+	assert.NotEmpty(t, validator.ValidateSchema(field))
+
+	// MinItems > MaxItems
+	field.ValidationSchema.BasicConstraints.MaxItems = initPointer(2)
+	field.ValidationSchema.BasicConstraints.MinItems = initPointer(3)
+	assert.NotEmpty(t, validator.ValidateSchema(field))
+
+	// MinItems == MaxItems
+	field.ValidationSchema.BasicConstraints.MinItems = initPointer(2)
+	assert.Empty(t, validator.ValidateSchema(field))
+
+	// Error in Subfield
+	field.Subfields[0].ValidationSchema.BasicConstraints.MaxItems = initPointer(-1)
+	assert.NotEmpty(t, validator.ValidateSchema(field))
 }
 
 func TestBasicConstraintsValidator_validateItemCount(t *testing.T) {
