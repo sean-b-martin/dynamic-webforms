@@ -23,7 +23,7 @@ example, "when field $X$ has the value $Y$, then allow it".
 
 ## Motivation
 
-During my dual study program at DHBW Mosbach, I was tasked with creating a library to handle complex dynamic web
-forms. The first implementation was functional, but was limited, due to time constraints. Additionally, it revealed some
-design issues that this library aims to address. The original implementation was also written in a different
-programming language.
+For the student research project during my dual study program at DHBW Mosbach, I was tasked with 
+creating a library to handle complex dynamic web forms. The initial implementation was functional, but limited, 
+due to time constraints. Additionally, it revealed some design issues that this library aims to address. 
+The original implementation was also written in a different programming language.
