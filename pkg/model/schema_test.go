@@ -46,7 +46,6 @@ func TestWebForm_GenerateIDs(t *testing.T) {
 	currentValue++
 	assert.Equal(t, currentValue, sections[1].Subsections[0].Fields[3].Subfields[1].ID)
 	currentValue++
-
 	assert.Equal(t, currentValue, sections[1].Subsections[1].ID)
 }
 

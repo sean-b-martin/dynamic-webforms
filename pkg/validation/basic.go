@@ -14,7 +14,7 @@ func NewBasicConstraintsValidator(defaultMaxItems int) BasicConstraintsValidator
 }
 
 func (b BasicConstraintsValidator) ValidateSchema(schema *model.WebFormField) []FormValidationError {
-	errs := make([]FormValidationError, 0)
+	var errs []FormValidationError
 
 	fields := make([]*model.WebFormSubfield, 0, 1+len(schema.Subfields))
 	fields = append(fields, schema.WebFormSubfield)
@@ -40,7 +40,7 @@ func (b BasicConstraintsValidator) ValidateData(data *model.WebFormDataRaw, sche
 }
 
 func (b BasicConstraintsValidator) validateItemCount(data *model.WebFormDataRaw, schema *model.BasicConstraints) []FormValidationError {
-	errs := make([]FormValidationError, 0)
+	var errs []FormValidationError
 
 	if schema.MinItems != nil && *schema.MinItems > len(data.Data) {
 		errs = append(errs, NewDataError(data.SchemaElementID, "amount of data too low, minimum allowed "+strconv.Itoa(*schema.MinItems)))

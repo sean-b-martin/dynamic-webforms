@@ -52,31 +52,31 @@ func (d *DatatypeRepository) GetDatatypeDefinitions() []DatatypeDefinition {
 }
 
 // GetDatatype returns the stored datatype,
-// returns Datatype,nil if successful and nil, DatatypeNotFoundError when no datatype was found
+// returns Datatype,nil if successful and nil, ErrDatatypeNotFound when no datatype was found
 func (d *DatatypeRepository) GetDatatype(identifier string) (*Datatype, error) {
 	if datatype, ok := d.datatypes[identifier]; ok {
 		return datatype, nil
 	}
 
-	return nil, DatatypeNotFoundError
+	return nil, ErrDatatypeNotFound
 }
 
-// AddDatatype returns nil if successful and DatatypeDuplicateError when DatatypeDefinition.Identifier is already used.
-// returns DatatypeInvalidParentError when using DatatypeDefinition.InheritsFrom if parent datatype does not exist or
+// AddDatatype returns nil if successful and ErrDatatypeDuplicate when DatatypeDefinition.Identifier is already used.
+// returns ErrDatatypeInvalidParent when using DatatypeDefinition.InheritsFrom if parent datatype does not exist or
 // the parent datatype has a different value for DatatypeDefinition.AllowsSubfields
 func (d *DatatypeRepository) AddDatatype(datatype *Datatype) error {
 	if _, ok := d.datatypes[datatype.definition.Identifier]; ok {
-		return DatatypeDuplicateError
+		return ErrDatatypeDuplicate
 	}
 
 	if datatype.definition.InheritsFrom != "" {
 		parentDatatype, ok := d.datatypes[datatype.definition.InheritsFrom]
 		if !ok {
-			return DatatypeInvalidParentError
+			return ErrDatatypeInvalidParent
 		}
 
 		if parentDatatype.definition.AllowsSubfields != datatype.definition.AllowsSubfields {
-			return DatatypeInvalidParentError
+			return ErrDatatypeInvalidParent
 		}
 	}
 
@@ -84,8 +84,8 @@ func (d *DatatypeRepository) AddDatatype(datatype *Datatype) error {
 	return nil
 }
 
-// DeleteDatatype deletes a stored datatype inside the repository, returns DatatypeNotFoundError when no datatype is
-// found, returns DatatypeIsParentError when trying to delete a datatype that is used by a different datatype in
+// DeleteDatatype deletes a stored datatype inside the repository, returns ErrDatatypeNotFound when no datatype is
+// found, returns ErrDatatypeIsParent when trying to delete a datatype that is used by a different datatype in
 // DatatypeDefinition.InheritsFrom.
 // This function should only be used before starting an application or using the repository to validate data.
 func (d *DatatypeRepository) DeleteDatatype(identifier string) error {
@@ -96,7 +96,7 @@ func (d *DatatypeRepository) DeleteDatatype(identifier string) error {
 			}
 
 			if v.definition.InheritsFrom == identifier {
-				return DatatypeIsParentError
+				return ErrDatatypeIsParent
 			}
 		}
 
@@ -104,5 +104,5 @@ func (d *DatatypeRepository) DeleteDatatype(identifier string) error {
 		return nil
 	}
 
-	return DatatypeNotFoundError
+	return ErrDatatypeNotFound
 }

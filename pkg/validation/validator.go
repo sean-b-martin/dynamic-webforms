@@ -73,10 +73,10 @@ func (f *FormValidator) ValidateData(values []*model.WebFormDataRaw, schema *mod
 	for _, value := range values {
 		subfield, err := helper.GetSubfield(value.SchemaElementID)
 
-		if errors.Is(err, WrongElementTypeError) {
+		if errors.Is(err, ErrWrongElementType) {
 			validationErrors = append(validationErrors, NewDataError(value.SchemaElementID, "element of schema id is not a (sub)field"))
 			continue
-		} else if errors.Is(err, ElementNotFoundError) {
+		} else if errors.Is(err, ErrElementNotFound) {
 			validationErrors = append(validationErrors, NewDataError(value.SchemaElementID, "schema id does not exist"))
 			continue
 		}

@@ -30,7 +30,7 @@ func TestDatatypeRepository_AddDatatype(t *testing.T) {
 	for _, datatypeDefinition := range expectedDatatypes {
 		err := repository.AddDatatype(&datatypeDefinition)
 		assert.Error(t, err)
-		assert.Equal(t, DatatypeDuplicateError, err)
+		assert.Equal(t, ErrDatatypeDuplicate, err)
 	}
 
 	// try adding a datatype with InheritsFrom
@@ -45,7 +45,7 @@ func TestDatatypeRepository_AddDatatype(t *testing.T) {
 
 	err := repository.AddDatatype(&inheritanceDatatype)
 	assert.Error(t, err)
-	assert.Equal(t, DatatypeInvalidParentError, err)
+	assert.Equal(t, ErrDatatypeInvalidParent, err)
 
 	inheritanceDatatype.definition.InheritsFrom = expectedDatatypes[0].definition.Identifier
 	assert.NoError(t, repository.AddDatatype(&inheritanceDatatype))
@@ -57,7 +57,7 @@ func TestDatatypeRepository_DeleteDatatype(t *testing.T) {
 	for _, datatypeDefinition := range expectedDatatypes {
 		err := repository.DeleteDatatype(datatypeDefinition.definition.Identifier)
 		assert.Error(t, err)
-		assert.Equal(t, DatatypeNotFoundError, err)
+		assert.Equal(t, ErrDatatypeNotFound, err)
 	}
 
 	for _, datatypeDefinition := range expectedDatatypes {
@@ -71,7 +71,7 @@ func TestDatatypeRepository_DeleteDatatype(t *testing.T) {
 	for _, datatypeDefinition := range expectedDatatypes {
 		err := repository.DeleteDatatype(datatypeDefinition.definition.Identifier)
 		assert.Error(t, err)
-		assert.Equal(t, DatatypeNotFoundError, err)
+		assert.Equal(t, ErrDatatypeNotFound, err)
 	}
 
 	// try removing a datatype where a different datatype inherits from
@@ -92,7 +92,7 @@ func TestDatatypeRepository_DeleteDatatype(t *testing.T) {
 
 	err := repository.DeleteDatatype(inheritsFrom)
 	assert.Error(t, err)
-	assert.Equal(t, DatatypeIsParentError, err)
+	assert.Equal(t, ErrDatatypeIsParent, err)
 
 	assert.NoError(t, repository.DeleteDatatype(inheritanceDatatype.definition.Identifier))
 	assert.NoError(t, repository.DeleteDatatype(inheritsFrom))
@@ -105,7 +105,7 @@ func TestDatatypeRepository_GetDatatype(t *testing.T) {
 		datatype, err := repository.GetDatatype(expectedDatatype.definition.Identifier)
 		assert.Nil(t, datatype)
 		assert.Error(t, err)
-		assert.Equal(t, DatatypeNotFoundError, err)
+		assert.Equal(t, ErrDatatypeNotFound, err)
 	}
 
 	for _, datatypeDefinition := range expectedDatatypes {
