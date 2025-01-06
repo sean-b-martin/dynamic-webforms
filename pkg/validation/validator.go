@@ -27,7 +27,7 @@ func (f *FormValidator) ValidateSchema(schema *model.WebFormSchema) []FormValida
 		return err
 	}
 
-	schemaErrors := make([]FormValidationError, 0)
+	var schemaErrors []FormValidationError
 
 	for _, section := range schema.Sections {
 		schemaErrors = append(schemaErrors, f.validateSchemaSection(section)...)
@@ -37,7 +37,7 @@ func (f *FormValidator) ValidateSchema(schema *model.WebFormSchema) []FormValida
 }
 
 func (f *FormValidator) validateSchemaSection(schema *model.WebFormSection) []FormValidationError {
-	schemaErrors := make([]FormValidationError, 0)
+	var schemaErrors []FormValidationError
 	for _, subsection := range schema.Subsections {
 		schemaErrors = append(schemaErrors, f.validateSchemaSection(subsection)...)
 	}
@@ -68,7 +68,7 @@ func (f *FormValidator) ValidateData(values []*model.WebFormDataRaw, schema *mod
 		return errs
 	}
 
-	validationErrors := make([]FormValidationError, 0)
+	var validationErrors []FormValidationError
 
 	for _, value := range values {
 		subfield, err := helper.GetSubfield(value.SchemaElementID)

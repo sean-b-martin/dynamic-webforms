@@ -47,7 +47,7 @@ type numberTypeValidator[T Number] struct {
 }
 
 func (v numberTypeValidator[T]) ValidateSchema(schema *model.WebFormField) []FormValidationError {
-	errors := make([]FormValidationError, 0)
+	var errors []FormValidationError
 
 	var dynamicConstraints DynamicNumberValidationSchema[T]
 	if schema.ValidationSchema.DynamicConstraints != nil {
@@ -103,7 +103,7 @@ func (v numberTypeValidator[T]) ValidateData(data *model.WebFormDataRaw, schema 
 	}
 
 	values := make([]T, len(data.Data))
-	schemaErrors := make([]FormValidationError, 0)
+	var schemaErrors []FormValidationError
 
 	for i, v := range data.Data {
 		var value T
@@ -117,7 +117,7 @@ func (v numberTypeValidator[T]) ValidateData(data *model.WebFormDataRaw, schema 
 		return schemaErrors
 	}
 
-	validationErrors := make([]FormValidationError, 0)
+	var validationErrors []FormValidationError
 
 	for i, value := range values {
 		if dynamicConstraints.Lt != nil && *dynamicConstraints.Lt <= value {

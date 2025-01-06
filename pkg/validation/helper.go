@@ -25,7 +25,7 @@ type FormValidationHelper struct {
 func NewFormValidationHelper() *FormValidationHelper {
 	return &FormValidationHelper{
 		elements: make(map[int]schemaElement),
-		errors:   make([]FormValidationError, 0),
+		errors:   nil,
 	}
 }
 
