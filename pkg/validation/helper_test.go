@@ -7,22 +7,19 @@ import (
 )
 
 var schema = model.WebFormSchema{
-	ID:   "",
-	Name: "",
 	Sections: []*model.WebFormSection{
 		{
-			ID:            0,
-			Title:         "section1",
-			Description:   nil,
-			ResourceLinks: nil,
-			Subsections:   nil,
+			ID:          0,
+			Title:       "section1",
+			Description: "",
+			Subsections: nil,
 			Fields: []*model.WebFormField{
 				{
 					WebFormSubfield: &model.WebFormSubfield{
 						ID:               2,
 						Title:            "field1",
 						Type:             "",
-						Description:      nil,
+						Description:      "",
 						ValidationSchema: &model.WebFormValidationSchema{},
 					},
 					Subfields: []*model.WebFormSubfield{
@@ -30,14 +27,14 @@ var schema = model.WebFormSchema{
 							ID:               3,
 							Title:            "subfield1",
 							Type:             "",
-							Description:      nil,
+							Description:      "",
 							ValidationSchema: &model.WebFormValidationSchema{},
 						},
 						{
 							ID:               4,
 							Title:            "subfield2",
 							Type:             "",
-							Description:      nil,
+							Description:      "",
 							ValidationSchema: &model.WebFormValidationSchema{},
 						},
 					},
@@ -45,17 +42,15 @@ var schema = model.WebFormSchema{
 			},
 		},
 		{
-			ID:            1,
-			Title:         "section2",
-			Description:   nil,
-			ResourceLinks: nil,
+			ID:          1,
+			Title:       "section2",
+			Description: "",
 			Subsections: []*model.WebFormSection{{
-				ID:            7,
-				Title:         "subsection1",
-				Description:   nil,
-				ResourceLinks: nil,
-				Subsections:   nil,
-				Fields:        nil,
+				ID:          7,
+				Title:       "subsection1",
+				Description: "",
+				Subsections: nil,
+				Fields:      nil,
 			}},
 			Fields: []*model.WebFormField{
 				{
@@ -63,7 +58,7 @@ var schema = model.WebFormSchema{
 						ID:               5,
 						Title:            "field2",
 						Type:             "",
-						Description:      nil,
+						Description:      "",
 						ValidationSchema: &model.WebFormValidationSchema{},
 					},
 					Subfields: nil,
@@ -73,7 +68,7 @@ var schema = model.WebFormSchema{
 						ID:               6,
 						Title:            "field3",
 						Type:             "",
-						Description:      nil,
+						Description:      "",
 						ValidationSchema: &model.WebFormValidationSchema{},
 					},
 					Subfields: nil,
@@ -174,12 +169,11 @@ func TestFormValidationHelper_ParseForm(t *testing.T) {
 	// duplicate id's
 	helper = NewFormValidationHelper()
 	invalidSchema := model.WebFormSchema{
-		ID:   "",
-		Name: "",
+		Title: "",
 		Sections: []*model.WebFormSection{
-			{ID: 1, Title: "", Description: nil, ResourceLinks: nil, Subsections: nil, Fields: nil},
-			{ID: 1, Title: "", Description: nil, ResourceLinks: nil, Subsections: nil, Fields: nil},
-			{ID: 1, Title: "", Description: nil, ResourceLinks: nil, Subsections: nil, Fields: nil},
+			{ID: 1, Title: "", Description: "", Subsections: nil, Fields: nil},
+			{ID: 1, Title: "", Description: "", Subsections: nil, Fields: nil},
+			{ID: 1, Title: "", Description: "", Subsections: nil, Fields: nil},
 		},
 	}
 
@@ -221,18 +215,17 @@ func TestFormValidationHelper_getElement(t *testing.T) {
 
 func TestFormValidationHelper_parseSection(t *testing.T) {
 	section := &model.WebFormSection{
-		ID:            0,
-		Title:         "",
-		Description:   nil,
-		ResourceLinks: nil,
-		Subsections:   nil,
+		ID:          0,
+		Title:       "",
+		Description: "",
+		Subsections: nil,
 		Fields: []*model.WebFormField{
 			{
 				WebFormSubfield: &model.WebFormSubfield{
 					ID:               1,
 					Title:            "",
 					Type:             "",
-					Description:      nil,
+					Description:      "",
 					ValidationSchema: &model.WebFormValidationSchema{},
 				},
 				Subfields: nil,

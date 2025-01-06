@@ -37,7 +37,7 @@ func TestBasicConstraintsValidator_ValidateSchema(t *testing.T) {
 			ID:          0,
 			Title:       "",
 			Type:        "",
-			Description: nil,
+			Description: "",
 			ValidationSchema: &model.WebFormValidationSchema{
 				BasicConstraints: model.BasicConstraints{},
 			},
@@ -47,7 +47,7 @@ func TestBasicConstraintsValidator_ValidateSchema(t *testing.T) {
 				ID:          0,
 				Title:       "",
 				Type:        "",
-				Description: nil,
+				Description: "",
 				ValidationSchema: &model.WebFormValidationSchema{
 					BasicConstraints: model.BasicConstraints{},
 				},

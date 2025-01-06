@@ -125,7 +125,7 @@ func Test_numberTypeValidator_ValidateSchema(t *testing.T) {
 			ID:               0,
 			Title:            "",
 			Type:             "",
-			Description:      nil,
+			Description:      "",
 			ValidationSchema: &model.WebFormValidationSchema{},
 		},
 		Subfields: nil,

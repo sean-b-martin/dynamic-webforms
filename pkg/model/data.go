@@ -12,8 +12,6 @@ type WebFormDataRaw struct {
 // WebFormData can be used when Data from WebFormDataRaw was successfully validated. Original Data is not validated here
 // in order to prevent errors like integer overflows when deserializing json.
 type WebFormData struct {
-	SchemaElementID int          `json:"schemaElementID"`
-	Data            []ParsedData `json:"data"`
+	SchemaElementID int           `json:"schemaElementID"`
+	Data            []interface{} `json:"data"`
 }
-
-type ParsedData interface{}
