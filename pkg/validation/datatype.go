@@ -24,21 +24,31 @@ func NewDatatype(definition DatatypeDefinition, validator DatatypeValidator) Dat
 	return Datatype{definition: definition, DatatypeValidator: validator}
 }
 
-func NewDatatypeRepository() DatatypeRepository {
-	return DatatypeRepository{datatypes: make(map[string]*Datatype)}
-}
+type DatatypeRepositoryOption func(*DatatypeRepository) error
 
-func AddDefaultDatatypes(repository DatatypeRepository) (DatatypeRepository, error) {
-	defaultDatatypes := []*Datatype{&DefaultIntNumberType, &DefaultFloatNumberType}
+func NewDatatypeRepository(options ...DatatypeRepositoryOption) (DatatypeRepository, error) {
+	repository := DatatypeRepository{datatypes: make(map[string]*Datatype)}
 
-	for _, datatype := range defaultDatatypes {
-		err := repository.AddDatatype(datatype)
-		if err != nil {
+	for _, option := range options {
+		if err := option(&repository); err != nil {
 			return repository, err
 		}
 	}
 
 	return repository, nil
+}
+
+func WithDefaultDatatypes(repository *DatatypeRepository) error {
+	defaultDatatypes := []*Datatype{&DefaultIntNumberType, &DefaultFloatNumberType}
+
+	for _, datatype := range defaultDatatypes {
+		err := repository.AddDatatype(datatype)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // GetDatatypeDefinitions returns a slice of all DatatypeDefinition available inside the repository

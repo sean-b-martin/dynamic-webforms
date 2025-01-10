@@ -21,7 +21,8 @@ var expectedDatatypes = []Datatype{
 }
 
 func TestDatatypeRepository_AddDatatype(t *testing.T) {
-	repository := NewDatatypeRepository()
+	repository, err := NewDatatypeRepository()
+	assert.Nil(t, err)
 
 	for _, datatypeDefinition := range expectedDatatypes {
 		assert.NoError(t, repository.AddDatatype(&datatypeDefinition))
@@ -43,7 +44,7 @@ func TestDatatypeRepository_AddDatatype(t *testing.T) {
 		},
 	}
 
-	err := repository.AddDatatype(&inheritanceDatatype)
+	err = repository.AddDatatype(&inheritanceDatatype)
 	assert.Error(t, err)
 	assert.Equal(t, ErrDatatypeInvalidParent, err)
 
@@ -52,7 +53,8 @@ func TestDatatypeRepository_AddDatatype(t *testing.T) {
 }
 
 func TestDatatypeRepository_DeleteDatatype(t *testing.T) {
-	repository := NewDatatypeRepository()
+	repository, err := NewDatatypeRepository()
+	assert.Nil(t, err)
 
 	for _, datatypeDefinition := range expectedDatatypes {
 		err := repository.DeleteDatatype(datatypeDefinition.definition.Identifier)
@@ -90,7 +92,7 @@ func TestDatatypeRepository_DeleteDatatype(t *testing.T) {
 	}
 	assert.NoError(t, repository.AddDatatype(&inheritanceDatatype))
 
-	err := repository.DeleteDatatype(inheritsFrom)
+	err = repository.DeleteDatatype(inheritsFrom)
 	assert.Error(t, err)
 	assert.Equal(t, ErrDatatypeIsParent, err)
 
@@ -99,7 +101,8 @@ func TestDatatypeRepository_DeleteDatatype(t *testing.T) {
 }
 
 func TestDatatypeRepository_GetDatatype(t *testing.T) {
-	repository := NewDatatypeRepository()
+	repository, err := NewDatatypeRepository()
+	assert.Nil(t, err)
 
 	for _, expectedDatatype := range expectedDatatypes {
 		datatype, err := repository.GetDatatype(expectedDatatype.definition.Identifier)
@@ -122,7 +125,8 @@ func TestDatatypeRepository_GetDatatype(t *testing.T) {
 }
 
 func TestDatatypeRepository_GetDatatypeDefinitions(t *testing.T) {
-	repository := NewDatatypeRepository()
+	repository, err := NewDatatypeRepository()
+	assert.Nil(t, err)
 
 	result := repository.GetDatatypeDefinitions()
 	assert.Equal(t, 0, len(result))
