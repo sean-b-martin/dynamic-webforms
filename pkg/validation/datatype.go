@@ -38,17 +38,17 @@ func NewDatatypeRepository(options ...DatatypeRepositoryOption) (DatatypeReposit
 	return repository, nil
 }
 
-func WithDefaultDatatypes(repository *DatatypeRepository) error {
-	defaultDatatypes := []*Datatype{&DefaultIntNumberType, &DefaultFloatNumberType}
-
-	for _, datatype := range defaultDatatypes {
-		err := repository.AddDatatype(datatype)
-		if err != nil {
-			return err
+func WithDefaultDatatypes() DatatypeRepositoryOption {
+	return func(repository *DatatypeRepository) error {
+		defaultDatatypes := []*Datatype{&DefaultIntNumberType, &DefaultFloatNumberType}
+		for _, datatype := range defaultDatatypes {
+			err := repository.AddDatatype(datatype)
+			if err != nil {
+				return err
+			}
 		}
+		return nil
 	}
-
-	return nil
 }
 
 // GetDatatypeDefinitions returns a slice of all DatatypeDefinition available inside the repository
