@@ -7,13 +7,13 @@ import (
 
 var expectedDatatypes = []Datatype{
 	{
-		definition: DatatypeDefinition{Identifier: "@test",
+		definition: DatatypeDefinition{ID: "@test",
 			DisplayName:     "test",
 			AllowsSubfields: false},
 	},
 	{
 		definition: DatatypeDefinition{
-			Identifier:      "@string",
+			ID:              "@string",
 			DisplayName:     "string",
 			AllowsSubfields: false,
 		},
@@ -33,23 +33,6 @@ func TestDatatypeRepository_AddDatatype(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, ErrDatatypeDuplicate, err)
 	}
-
-	// try adding a datatype with InheritsFrom
-	inheritanceDatatype := Datatype{
-		definition: DatatypeDefinition{
-			Identifier:      "inheritingDatatype",
-			DisplayName:     "test",
-			AllowsSubfields: false,
-			InheritsFrom:    "@nonexistent",
-		},
-	}
-
-	err = repository.AddDatatype(&inheritanceDatatype)
-	assert.Error(t, err)
-	assert.Equal(t, ErrDatatypeInvalidParent, err)
-
-	inheritanceDatatype.definition.InheritsFrom = expectedDatatypes[0].definition.Identifier
-	assert.NoError(t, repository.AddDatatype(&inheritanceDatatype))
 }
 
 func TestDatatypeRepository_DeleteDatatype(t *testing.T) {
@@ -57,7 +40,7 @@ func TestDatatypeRepository_DeleteDatatype(t *testing.T) {
 	assert.Nil(t, err)
 
 	for _, datatypeDefinition := range expectedDatatypes {
-		err := repository.DeleteDatatype(datatypeDefinition.definition.Identifier)
+		err := repository.DeleteDatatype(datatypeDefinition.definition.ID)
 		assert.Error(t, err)
 		assert.Equal(t, ErrDatatypeNotFound, err)
 	}
@@ -67,37 +50,14 @@ func TestDatatypeRepository_DeleteDatatype(t *testing.T) {
 	}
 
 	for _, datatypeDefinition := range expectedDatatypes {
-		assert.NoError(t, repository.DeleteDatatype(datatypeDefinition.definition.Identifier))
+		assert.NoError(t, repository.DeleteDatatype(datatypeDefinition.definition.ID))
 	}
 
 	for _, datatypeDefinition := range expectedDatatypes {
-		err := repository.DeleteDatatype(datatypeDefinition.definition.Identifier)
+		err := repository.DeleteDatatype(datatypeDefinition.definition.ID)
 		assert.Error(t, err)
 		assert.Equal(t, ErrDatatypeNotFound, err)
 	}
-
-	// try removing a datatype where a different datatype inherits from
-	for _, datatypeDefinition := range expectedDatatypes {
-		assert.NoError(t, repository.AddDatatype(&datatypeDefinition))
-	}
-
-	inheritsFrom := "@string"
-	inheritanceDatatype := Datatype{
-		definition: DatatypeDefinition{
-			Identifier:      "inheritingDatatype",
-			DisplayName:     "test",
-			AllowsSubfields: false,
-			InheritsFrom:    inheritsFrom,
-		},
-	}
-	assert.NoError(t, repository.AddDatatype(&inheritanceDatatype))
-
-	err = repository.DeleteDatatype(inheritsFrom)
-	assert.Error(t, err)
-	assert.Equal(t, ErrDatatypeIsParent, err)
-
-	assert.NoError(t, repository.DeleteDatatype(inheritanceDatatype.definition.Identifier))
-	assert.NoError(t, repository.DeleteDatatype(inheritsFrom))
 }
 
 func TestDatatypeRepository_GetDatatype(t *testing.T) {
@@ -105,7 +65,7 @@ func TestDatatypeRepository_GetDatatype(t *testing.T) {
 	assert.Nil(t, err)
 
 	for _, expectedDatatype := range expectedDatatypes {
-		datatype, err := repository.GetDatatype(expectedDatatype.definition.Identifier)
+		datatype, err := repository.GetDatatype(expectedDatatype.definition.ID)
 		assert.Nil(t, datatype)
 		assert.Error(t, err)
 		assert.Equal(t, ErrDatatypeNotFound, err)
@@ -116,7 +76,7 @@ func TestDatatypeRepository_GetDatatype(t *testing.T) {
 	}
 
 	for _, expectedDatatype := range expectedDatatypes {
-		datatype, err := repository.GetDatatype(expectedDatatype.definition.Identifier)
+		datatype, err := repository.GetDatatype(expectedDatatype.definition.ID)
 		if assert.NotNil(t, datatype) {
 			assert.Equal(t, expectedDatatype, *datatype)
 		}
@@ -141,11 +101,11 @@ func TestDatatypeRepository_GetDatatypeDefinitions(t *testing.T) {
 	expected := make(map[string]Datatype)
 
 	for _, expectedDatatype := range expectedDatatypes {
-		expected[expectedDatatype.definition.Identifier] = expectedDatatype
+		expected[expectedDatatype.definition.ID] = expectedDatatype
 	}
 
 	for _, definition := range result {
-		res, ok := expected[definition.Identifier]
+		res, ok := expected[definition.ID]
 		assert.True(t, ok)
 		assert.NotEmpty(t, res)
 		assert.Equal(t, res.definition, definition)

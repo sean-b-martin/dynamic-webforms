@@ -104,3 +104,7 @@ func TestBasicConstraintsValidator_validateItemCount(t *testing.T) {
 	validator = NewBasicConstraintsValidator(100)
 	assert.Empty(t, validator.validateItemCount(data, &basicConstraints))
 }
+
+func initPointer[T any](value T) *T {
+	return &value
+}

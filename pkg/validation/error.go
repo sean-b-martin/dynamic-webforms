@@ -7,12 +7,10 @@ import (
 )
 
 var (
-	ErrDatatypeDuplicate     = errors.New("dynamic-forms: datatype already exists")
-	ErrDatatypeNotFound      = errors.New("dynamic-forms: datatype not found")
-	ErrDatatypeInvalidParent = errors.New("dynamic-forms: invalid parent datatype")
-	ErrDatatypeIsParent      = errors.New("dynamic-forms: datatype is parent")
-	ErrElementNotFound       = errors.New("dynamic-forms: element not found")
-	ErrWrongElementType      = errors.New("dynamic-forms: wrong element type")
+	ErrDatatypeDuplicate = errors.New("dynamic-forms: datatype already exists")
+	ErrDatatypeNotFound  = errors.New("dynamic-forms: datatype not found")
+	ErrElementNotFound   = errors.New("dynamic-forms: element not found")
+	ErrWrongElementType  = errors.New("dynamic-forms: wrong element type")
 )
 
 type FormValidationError struct {
