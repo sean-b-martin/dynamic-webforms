@@ -102,7 +102,7 @@ func TestGenericNumberValidator_ValidateData(t *testing.T) {
 }
 
 func testValidate[T Number](t *testing.T, validator *GenericNumberValidator[T], data *model.WebFormDataRaw, constraints json.RawMessage, expectErr bool) {
-	err := validator.ValidateData(data, intoRawMessage(constraints)[0])
+	err := validator.ValidateData(data, &intoRawMessage(constraints)[0])
 	if expectErr {
 		assert.False(t, err.IsEmpty())
 		assert.Len(t, err.FailedConstraints, 1)
