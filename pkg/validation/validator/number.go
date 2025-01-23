@@ -30,17 +30,84 @@ type DynamicNumberValidationSchema[T Number] struct {
 
 type GenericNumberValidator[T Number] struct{}
 
-func (validator *GenericNumberValidator[T]) ValidateData(data *model.WebFormDataRaw, rawConstraints json.RawMessage) FieldValidatorError {
+func (validator *GenericNumberValidator[T]) ValidateFieldSchema(id int, rawConstraints *json.RawMessage) FieldValidatorError {
+	validatorErr := NewFieldValidatorError(id)
+
+	var dynamicConstraints DynamicNumberValidationSchema[T]
+	if err := unmarshalValidationSchema(rawConstraints, &dynamicConstraints); err != nil {
+		validatorErr.AddFailedConstraint(*err)
+		return validatorErr
+	}
+
+	if dynamicConstraints.Lt != nil {
+		if dynamicConstraints.Gt != nil && *dynamicConstraints.Lt <= *dynamicConstraints.Gt {
+			validatorErr.AddFailedConstraint(FailedConstraintError{
+				Constraint: "lt",
+				DataIndex:  -1,
+				Message:    "lt must be greater than gt",
+				Config:     nil,
+			})
+		}
+		if dynamicConstraints.Gte != nil && *dynamicConstraints.Lt <= *dynamicConstraints.Gte {
+			validatorErr.AddFailedConstraint(FailedConstraintError{
+				Constraint: "lt",
+				DataIndex:  -1,
+				Message:    "lt must be greater than gte",
+				Config:     nil,
+			})
+		}
+	}
+
+	if dynamicConstraints.Lte != nil {
+		if dynamicConstraints.Gt != nil && *dynamicConstraints.Lte <= *dynamicConstraints.Gt {
+			validatorErr.AddFailedConstraint(FailedConstraintError{
+				Constraint: "lt",
+				DataIndex:  -1,
+				Message:    "lte must be greater than gt",
+				Config:     nil,
+			})
+		}
+		if dynamicConstraints.Gte != nil && *dynamicConstraints.Lte < *dynamicConstraints.Gte {
+			validatorErr.AddFailedConstraint(FailedConstraintError{
+				Constraint: "lt",
+				DataIndex:  -1,
+				Message:    "lte must be greater than or equal gte",
+				Config:     nil,
+			})
+		}
+	}
+
+	if dynamicConstraints.MinDigits != nil {
+		if dynamicConstraints.MaxDigits != nil && *dynamicConstraints.MaxDigits < *dynamicConstraints.MinDigits {
+			if dynamicConstraints.Gte != nil && *dynamicConstraints.Lte < *dynamicConstraints.Gte {
+				validatorErr.AddFailedConstraint(FailedConstraintError{
+					Constraint: "lt",
+					DataIndex:  -1,
+					Message:    "minDigits must be greater than maxDigits",
+					Config:     nil,
+				})
+			}
+		}
+	}
+
+	if dynamicConstraints.MaxDigits != nil && *dynamicConstraints.MaxDigits <= 0 {
+		validatorErr.AddFailedConstraint(FailedConstraintError{
+			Constraint: "lt",
+			DataIndex:  -1,
+			Message:    "maxDigits must be greater than 0",
+			Config:     nil,
+		})
+	}
+
+	return validatorErr
+}
+
+func (validator *GenericNumberValidator[T]) ValidateFieldData(data *model.WebFormDataRaw, rawConstraints *json.RawMessage) FieldValidatorError {
 	validatorErr := NewFieldValidatorError(data.SchemaElementID)
 
 	var constraints DynamicNumberValidationSchema[T]
-	if err := json.Unmarshal(rawConstraints, &constraints); err != nil {
-		validatorErr.AddFailedConstraint(FailedConstraintError{
-			Constraint: "schema",
-			DataIndex:  -1,
-			Message:    validatorErr.Error(),
-			Config:     nil,
-		})
+	if err := unmarshalValidationSchema(rawConstraints, &constraints); err != nil {
+		validatorErr.AddFailedConstraint(*err)
 		return validatorErr
 	}
 

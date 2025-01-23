@@ -14,8 +14,8 @@ func TestNewBasicConstraintsValidator(t *testing.T) {
 func TestBasicConstraintsValidator_ValidateData(t *testing.T) {
 	validator := NewBasicConstraintsValidator(1)
 	basicConstraints := model.BasicConstraints{
-		MinItems: initPointer(0),
-		MaxItems: initPointer(2),
+		MinItems: makePtr(0),
+		MaxItems: makePtr(2),
 	}
 
 	data := &model.WebFormDataRaw{
@@ -57,28 +57,28 @@ func TestBasicConstraintsValidator_ValidateSchema(t *testing.T) {
 
 	assert.Empty(t, validator.ValidateSchema(field))
 
-	field.ValidationSchema.BasicConstraints.MaxItems = initPointer(-1)
+	field.ValidationSchema.BasicConstraints.MaxItems = makePtr(-1)
 	assert.NotEmpty(t, validator.ValidateSchema(field))
 
 	// MinItems > MaxItems
-	field.ValidationSchema.BasicConstraints.MaxItems = initPointer(2)
-	field.ValidationSchema.BasicConstraints.MinItems = initPointer(3)
+	field.ValidationSchema.BasicConstraints.MaxItems = makePtr(2)
+	field.ValidationSchema.BasicConstraints.MinItems = makePtr(3)
 	assert.NotEmpty(t, validator.ValidateSchema(field))
 
 	// MinItems == MaxItems
-	field.ValidationSchema.BasicConstraints.MinItems = initPointer(2)
+	field.ValidationSchema.BasicConstraints.MinItems = makePtr(2)
 	assert.Empty(t, validator.ValidateSchema(field))
 
 	// Error in Subfield
-	field.Subfields[0].ValidationSchema.BasicConstraints.MaxItems = initPointer(-1)
+	field.Subfields[0].ValidationSchema.BasicConstraints.MaxItems = makePtr(-1)
 	assert.NotEmpty(t, validator.ValidateSchema(field))
 }
 
 func TestBasicConstraintsValidator_validateItemCount(t *testing.T) {
 	validator := NewBasicConstraintsValidator(1)
 	basicConstraints := model.BasicConstraints{
-		MinItems: initPointer(0),
-		MaxItems: initPointer(3),
+		MinItems: makePtr(0),
+		MaxItems: makePtr(3),
 	}
 
 	data := &model.WebFormDataRaw{
@@ -105,6 +105,6 @@ func TestBasicConstraintsValidator_validateItemCount(t *testing.T) {
 	assert.Empty(t, validator.validateItemCount(data, &basicConstraints))
 }
 
-func initPointer[T any](value T) *T {
+func makePtr[T any](value T) *T {
 	return &value
 }
