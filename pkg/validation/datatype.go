@@ -1,5 +1,9 @@
 package validation
 
+import (
+	"github.com/sean-b-martin/dynamic-webforms/pkg/validation/validator/datatype"
+)
+
 // DatatypeDefinition contains metadata about a datatype such as the id for using the datatype
 // and whether the datatype allows subfields or not.
 type DatatypeDefinition struct {
@@ -11,7 +15,7 @@ type DatatypeDefinition struct {
 // Datatype contains its definition and all rules for validation
 type Datatype struct {
 	definition DatatypeDefinition
-	DatatypeValidator
+	datatype.Validator
 }
 
 type DatatypeDynamicConstraints struct {
@@ -19,6 +23,6 @@ type DatatypeDynamicConstraints struct {
 	Constraints          map[string]interface{}      `json:"rules,omitempty"`
 }
 
-func NewDatatype(definition DatatypeDefinition, validator DatatypeValidator) Datatype {
-	return Datatype{definition: definition, DatatypeValidator: validator}
+func NewDatatype(definition DatatypeDefinition, datatypeValidator datatype.Validator) Datatype {
+	return Datatype{definition: definition, Validator: datatypeValidator}
 }

@@ -37,7 +37,7 @@ func (validator *GenericNumberValidator[T]) New() Validator {
 	return &GenericNumberValidator[T]{}
 }
 
-func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *json.RawMessage) common.FieldValidatorError {
+func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *json.RawMessage) common.ValidatorError {
 	validatorErr := common.NewFieldValidatorError(id)
 
 	if err := common.UnmarshalValidationSchema(rawConstraints, &validator.constraints); err != nil {
@@ -107,7 +107,7 @@ func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *j
 	return validatorErr
 }
 
-func (validator *GenericNumberValidator[T]) Validate(data *model.WebFormDataRaw) common.FieldValidatorError {
+func (validator *GenericNumberValidator[T]) Validate(data *model.WebFormDataRaw) common.ValidatorError {
 	validatorErr := common.NewFieldValidatorError(data.SchemaElementID)
 
 	constraints := validator.constraints

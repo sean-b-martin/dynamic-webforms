@@ -8,6 +8,6 @@ import (
 
 type Validator interface {
 	New() Validator
-	Initialize(id int, rawConstraints *json.RawMessage) common.FieldValidatorError
-	Validate(data *model.WebFormDataRaw) common.FieldValidatorError
+	Initialize(id int, rawConstraints *json.RawMessage) common.ValidatorError
+	Validate(data *model.WebFormDataRaw) common.ValidatorError
 }
