@@ -1,9 +1,10 @@
-package validator
+package datatype
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/sean-b-martin/dynamic-webforms/pkg/model"
+	"github.com/sean-b-martin/dynamic-webforms/pkg/validation/validator/common"
 	"strings"
 )
 
@@ -32,21 +33,21 @@ type GenericNumberValidator[T Number] struct {
 	constraints DynamicNumberValidationSchema[T]
 }
 
-func (validator *GenericNumberValidator[T]) New() DatatypeValidator {
+func (validator *GenericNumberValidator[T]) New() Validator {
 	return &GenericNumberValidator[T]{}
 }
 
-func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *json.RawMessage) FieldValidatorError {
-	validatorErr := NewFieldValidatorError(id)
+func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *json.RawMessage) common.FieldValidatorError {
+	validatorErr := common.NewFieldValidatorError(id)
 
-	if err := unmarshalValidationSchema(rawConstraints, &validator.constraints); err != nil {
+	if err := common.UnmarshalValidationSchema(rawConstraints, &validator.constraints); err != nil {
 		validatorErr.AddFailedConstraint(*err)
 		return validatorErr
 	}
 
 	if validator.constraints.Lt != nil {
 		if validator.constraints.Gt != nil && *validator.constraints.Lt <= *validator.constraints.Gt {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "lt",
 				DataIndex:  -1,
 				Message:    "lt must be greater than gt",
@@ -54,7 +55,7 @@ func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *j
 			})
 		}
 		if validator.constraints.Gte != nil && *validator.constraints.Lt <= *validator.constraints.Gte {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "lt",
 				DataIndex:  -1,
 				Message:    "lt must be greater than gte",
@@ -65,7 +66,7 @@ func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *j
 
 	if validator.constraints.Lte != nil {
 		if validator.constraints.Gt != nil && *validator.constraints.Lte <= *validator.constraints.Gt {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "lt",
 				DataIndex:  -1,
 				Message:    "lte must be greater than gt",
@@ -73,7 +74,7 @@ func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *j
 			})
 		}
 		if validator.constraints.Gte != nil && *validator.constraints.Lte < *validator.constraints.Gte {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "lt",
 				DataIndex:  -1,
 				Message:    "lte must be greater than or equal gte",
@@ -85,7 +86,7 @@ func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *j
 	if validator.constraints.MinDigits != nil {
 		if validator.constraints.MaxDigits != nil && *validator.constraints.MaxDigits < *validator.constraints.MinDigits {
 			if validator.constraints.Gte != nil && *validator.constraints.Lte < *validator.constraints.Gte {
-				validatorErr.AddFailedConstraint(FailedConstraintError{
+				validatorErr.AddFailedConstraint(common.FailedConstraintError{
 					Constraint: "lt",
 					DataIndex:  -1,
 					Message:    "minDigits must be greater than maxDigits",
@@ -96,7 +97,7 @@ func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *j
 	}
 
 	if validator.constraints.MaxDigits != nil && *validator.constraints.MaxDigits <= 0 {
-		validatorErr.AddFailedConstraint(FailedConstraintError{
+		validatorErr.AddFailedConstraint(common.FailedConstraintError{
 			Constraint: "lt",
 			DataIndex:  -1,
 			Message:    "maxDigits must be greater than 0",
@@ -107,15 +108,15 @@ func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *j
 	return validatorErr
 }
 
-func (validator *GenericNumberValidator[T]) ValidateFieldData(data *model.WebFormDataRaw) FieldValidatorError {
-	validatorErr := NewFieldValidatorError(data.SchemaElementID)
+func (validator *GenericNumberValidator[T]) Validate(data *model.WebFormDataRaw) common.FieldValidatorError {
+	validatorErr := common.NewFieldValidatorError(data.SchemaElementID)
 
 	constraints := validator.constraints
 
 	for index, v := range data.Data {
 		var value T
 		if err := json.Unmarshal(v, &value); err != nil {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "datatype",
 				DataIndex:  index,
 				Message:    err.Error(),
@@ -126,7 +127,7 @@ func (validator *GenericNumberValidator[T]) ValidateFieldData(data *model.WebFor
 		}
 
 		if constraints.Lt != nil && *constraints.Lt <= value {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "lt",
 				DataIndex:  index,
 				Message:    "must be less than",
@@ -135,7 +136,7 @@ func (validator *GenericNumberValidator[T]) ValidateFieldData(data *model.WebFor
 		}
 
 		if constraints.Gt != nil && *constraints.Gt >= value {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "gt",
 				DataIndex:  index,
 				Message:    "must be greater than",
@@ -144,7 +145,7 @@ func (validator *GenericNumberValidator[T]) ValidateFieldData(data *model.WebFor
 		}
 
 		if constraints.Lte != nil && *constraints.Lte < value {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "lte",
 				DataIndex:  index,
 				Message:    "must be less than or equal",
@@ -153,7 +154,7 @@ func (validator *GenericNumberValidator[T]) ValidateFieldData(data *model.WebFor
 		}
 
 		if constraints.Gte != nil && *constraints.Gte > value {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "gte",
 				DataIndex:  index,
 				Message:    "must be greater than or equal",
@@ -167,7 +168,7 @@ func (validator *GenericNumberValidator[T]) ValidateFieldData(data *model.WebFor
 
 		valueStr := strings.Split(fmt.Sprintf("%v", value), ".")[0]
 		if constraints.MinDigits != nil && *constraints.MinDigits > len(valueStr) {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "minDigits",
 				DataIndex:  index,
 				Message:    "must have more digits than",
@@ -176,7 +177,7 @@ func (validator *GenericNumberValidator[T]) ValidateFieldData(data *model.WebFor
 		}
 
 		if constraints.MaxDigits != nil && *constraints.MaxDigits < len(valueStr) {
-			validatorErr.AddFailedConstraint(FailedConstraintError{
+			validatorErr.AddFailedConstraint(common.FailedConstraintError{
 				Constraint: "maxDigits",
 				DataIndex:  index,
 				Message:    "must have less digits than",

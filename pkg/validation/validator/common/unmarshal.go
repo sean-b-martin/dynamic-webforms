@@ -1,10 +1,10 @@
-package validator
+package common
 
 import (
 	"encoding/json"
 )
 
-func unmarshalValidationSchema[T any](data *json.RawMessage, result *T) *FailedConstraintError {
+func UnmarshalValidationSchema[T any](data *json.RawMessage, result *T) *FailedConstraintError {
 	if err := json.Unmarshal(*data, result); err != nil {
 		return &FailedConstraintError{
 			Constraint: "schema",

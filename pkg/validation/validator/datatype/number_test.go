@@ -1,4 +1,4 @@
-package validator
+package datatype
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestGenericNumberValidator_ValidateFieldData(t *testing.T) {
+func TestGenericNumberValidator_Validate(t *testing.T) {
 	data := model.WebFormDataRaw{
 		SchemaElementID: 1,
 		Data:            intoRawMessage(128),
@@ -23,80 +23,80 @@ func TestGenericNumberValidator_ValidateFieldData(t *testing.T) {
 	}
 
 	// value < lt
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], false)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], false)
 
 	// value > lt
 	constraints.Lt = makePtr(64)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], true)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], true)
 
 	// value == lt
 	constraints.Lt = makePtr(128)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], true)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], true)
 	constraints.Lt = nil
 
 	// value > gt
 	constraints.Gt = makePtr(0)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], false)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], false)
 
 	// value < gt
 	constraints.Gt = makePtr(256)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], true)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], true)
 
 	// value == gt
 	constraints.Gt = makePtr(128)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], true)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], true)
 	constraints.Gt = nil
 
 	// value < lte
 	constraints.Lte = makePtr(256)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], false)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], false)
 
 	// value > lte
 	constraints.Lte = makePtr(64)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], true)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], true)
 
 	// value == lte
 	constraints.Lte = makePtr(128)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], false)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], false)
 	constraints.Lte = nil
 
 	// value < gte
 	constraints.Gte = makePtr(256)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], true)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], true)
 
 	// value > gte
 	constraints.Gte = makePtr(0)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], false)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], false)
 
 	// value == gte
 	constraints.Gte = makePtr(128)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], false)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], false)
 	constraints.Gte = nil
 
 	// value < MinDigits
 	constraints.MinDigits = makePtr(5)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], true)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], true)
 
 	// value > MinDigits
 	constraints.MinDigits = makePtr(2)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], false)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], false)
 
 	// value == MinDigits
 	constraints.MinDigits = makePtr(3)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], false)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], false)
 	constraints.MinDigits = nil
 
 	// value < MaxDigits
 	constraints.MaxDigits = makePtr(5)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], false)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], false)
 
 	// value > MaxDigits
 	constraints.MaxDigits = makePtr(2)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], true)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], true)
 
 	// value == MaxDigits
 	constraints.MaxDigits = makePtr(3)
-	testValidateData[int](t, &data, intoRawMessage(constraints)[0], false)
+	testValidate[int](t, &data, intoRawMessage(constraints)[0], false)
 }
 
 func Test_numberTypeValidator_Initialize(t *testing.T) {
@@ -158,11 +158,11 @@ func Test_numberTypeValidator_Initialize(t *testing.T) {
 	testInitialize[int](t, id, intoRawMessage(constraints)[0], true)
 }
 
-func testValidateData[T Number](t *testing.T, data *model.WebFormDataRaw, constraints json.RawMessage, expectErr bool) {
+func testValidate[T Number](t *testing.T, data *model.WebFormDataRaw, constraints json.RawMessage, expectErr bool) {
 	validator := GenericNumberValidator[T]{}
 	err := validator.Initialize(data.SchemaElementID, &constraints)
 	assert.True(t, err.IsEmpty())
-	err = validator.ValidateFieldData(data)
+	err = validator.Validate(data)
 	if expectErr {
 		assert.False(t, err.IsEmpty())
 		assert.Len(t, err.FailedConstraints, 1)
