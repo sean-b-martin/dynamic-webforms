@@ -16,24 +16,24 @@ func (e *FailedConstraintError) Error() string {
 	return e.Message
 }
 
-type FieldValidatorError struct {
+type ValidatorError struct {
 	SchemaElementID   int                     `json:"schemaElementID"`
 	FailedConstraints []FailedConstraintError `json:"errors"`
 }
 
-func (e *FieldValidatorError) AddFailedConstraint(constraintError FailedConstraintError) {
+func (e *ValidatorError) AddFailedConstraint(constraintError FailedConstraintError) {
 	e.FailedConstraints = append(e.FailedConstraints, constraintError)
 }
 
-func (e *FieldValidatorError) IsEmpty() bool {
+func (e *ValidatorError) IsEmpty() bool {
 	return len(e.FailedConstraints) == 0
 }
 
-func NewFieldValidatorError(schemaElementID int) FieldValidatorError {
-	return FieldValidatorError{SchemaElementID: schemaElementID}
+func NewFieldValidatorError(schemaElementID int) ValidatorError {
+	return ValidatorError{SchemaElementID: schemaElementID}
 }
 
-func (e *FieldValidatorError) Error() string {
+func (e *ValidatorError) Error() string {
 	if len(e.FailedConstraints) == 0 {
 		return ""
 	}
