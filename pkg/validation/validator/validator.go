@@ -6,6 +6,7 @@ import (
 )
 
 type DatatypeValidator interface {
-	ValidateFieldSchema(id int, rawConstraints *json.RawMessage) FieldValidatorError
-	ValidateFieldData(data *model.WebFormDataRaw, rawConstraints *json.RawMessage) FieldValidatorError
+	New() DatatypeValidator
+	Initialize(id int, rawConstraints *json.RawMessage) FieldValidatorError
+	ValidateFieldData(data *model.WebFormDataRaw) FieldValidatorError
 }

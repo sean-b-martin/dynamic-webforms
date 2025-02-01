@@ -28,19 +28,24 @@ type DynamicNumberValidationSchema[T Number] struct {
 	MaxDigits *int `json:"maxDigits,omitempty"`
 }
 
-type GenericNumberValidator[T Number] struct{}
+type GenericNumberValidator[T Number] struct {
+	constraints DynamicNumberValidationSchema[T]
+}
 
-func (validator *GenericNumberValidator[T]) ValidateFieldSchema(id int, rawConstraints *json.RawMessage) FieldValidatorError {
+func (validator *GenericNumberValidator[T]) New() DatatypeValidator {
+	return &GenericNumberValidator[T]{}
+}
+
+func (validator *GenericNumberValidator[T]) Initialize(id int, rawConstraints *json.RawMessage) FieldValidatorError {
 	validatorErr := NewFieldValidatorError(id)
 
-	var dynamicConstraints DynamicNumberValidationSchema[T]
-	if err := unmarshalValidationSchema(rawConstraints, &dynamicConstraints); err != nil {
+	if err := unmarshalValidationSchema(rawConstraints, &validator.constraints); err != nil {
 		validatorErr.AddFailedConstraint(*err)
 		return validatorErr
 	}
 
-	if dynamicConstraints.Lt != nil {
-		if dynamicConstraints.Gt != nil && *dynamicConstraints.Lt <= *dynamicConstraints.Gt {
+	if validator.constraints.Lt != nil {
+		if validator.constraints.Gt != nil && *validator.constraints.Lt <= *validator.constraints.Gt {
 			validatorErr.AddFailedConstraint(FailedConstraintError{
 				Constraint: "lt",
 				DataIndex:  -1,
@@ -48,7 +53,7 @@ func (validator *GenericNumberValidator[T]) ValidateFieldSchema(id int, rawConst
 				Config:     nil,
 			})
 		}
-		if dynamicConstraints.Gte != nil && *dynamicConstraints.Lt <= *dynamicConstraints.Gte {
+		if validator.constraints.Gte != nil && *validator.constraints.Lt <= *validator.constraints.Gte {
 			validatorErr.AddFailedConstraint(FailedConstraintError{
 				Constraint: "lt",
 				DataIndex:  -1,
@@ -58,8 +63,8 @@ func (validator *GenericNumberValidator[T]) ValidateFieldSchema(id int, rawConst
 		}
 	}
 
-	if dynamicConstraints.Lte != nil {
-		if dynamicConstraints.Gt != nil && *dynamicConstraints.Lte <= *dynamicConstraints.Gt {
+	if validator.constraints.Lte != nil {
+		if validator.constraints.Gt != nil && *validator.constraints.Lte <= *validator.constraints.Gt {
 			validatorErr.AddFailedConstraint(FailedConstraintError{
 				Constraint: "lt",
 				DataIndex:  -1,
@@ -67,7 +72,7 @@ func (validator *GenericNumberValidator[T]) ValidateFieldSchema(id int, rawConst
 				Config:     nil,
 			})
 		}
-		if dynamicConstraints.Gte != nil && *dynamicConstraints.Lte < *dynamicConstraints.Gte {
+		if validator.constraints.Gte != nil && *validator.constraints.Lte < *validator.constraints.Gte {
 			validatorErr.AddFailedConstraint(FailedConstraintError{
 				Constraint: "lt",
 				DataIndex:  -1,
@@ -77,9 +82,9 @@ func (validator *GenericNumberValidator[T]) ValidateFieldSchema(id int, rawConst
 		}
 	}
 
-	if dynamicConstraints.MinDigits != nil {
-		if dynamicConstraints.MaxDigits != nil && *dynamicConstraints.MaxDigits < *dynamicConstraints.MinDigits {
-			if dynamicConstraints.Gte != nil && *dynamicConstraints.Lte < *dynamicConstraints.Gte {
+	if validator.constraints.MinDigits != nil {
+		if validator.constraints.MaxDigits != nil && *validator.constraints.MaxDigits < *validator.constraints.MinDigits {
+			if validator.constraints.Gte != nil && *validator.constraints.Lte < *validator.constraints.Gte {
 				validatorErr.AddFailedConstraint(FailedConstraintError{
 					Constraint: "lt",
 					DataIndex:  -1,
@@ -90,7 +95,7 @@ func (validator *GenericNumberValidator[T]) ValidateFieldSchema(id int, rawConst
 		}
 	}
 
-	if dynamicConstraints.MaxDigits != nil && *dynamicConstraints.MaxDigits <= 0 {
+	if validator.constraints.MaxDigits != nil && *validator.constraints.MaxDigits <= 0 {
 		validatorErr.AddFailedConstraint(FailedConstraintError{
 			Constraint: "lt",
 			DataIndex:  -1,
@@ -102,14 +107,10 @@ func (validator *GenericNumberValidator[T]) ValidateFieldSchema(id int, rawConst
 	return validatorErr
 }
 
-func (validator *GenericNumberValidator[T]) ValidateFieldData(data *model.WebFormDataRaw, rawConstraints *json.RawMessage) FieldValidatorError {
+func (validator *GenericNumberValidator[T]) ValidateFieldData(data *model.WebFormDataRaw) FieldValidatorError {
 	validatorErr := NewFieldValidatorError(data.SchemaElementID)
 
-	var constraints DynamicNumberValidationSchema[T]
-	if err := unmarshalValidationSchema(rawConstraints, &constraints); err != nil {
-		validatorErr.AddFailedConstraint(*err)
-		return validatorErr
-	}
+	constraints := validator.constraints
 
 	for index, v := range data.Data {
 		var value T
