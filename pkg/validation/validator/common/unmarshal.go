@@ -8,7 +8,7 @@ func UnmarshalValidationSchema[T any](data *json.RawMessage, result *T) *FailedC
 	if err := json.Unmarshal(*data, result); err != nil {
 		return &FailedConstraintError{
 			Constraint: "schema",
-			DataIndex:  -1,
+			DataIndex:  nil,
 			Message:    err.Error(),
 			Config:     nil,
 		}

@@ -7,7 +7,7 @@ import (
 
 type FailedConstraintError struct {
 	Constraint string      `json:"constraint"`
-	DataIndex  int         `json:"dataIndex"`
+	DataIndex  *int        `json:"dataIndex,omitempty"`
 	Message    string      `json:"message"`
 	Config     interface{} `json:"config,omitempty"`
 }
