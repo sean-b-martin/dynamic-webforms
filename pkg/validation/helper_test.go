@@ -7,22 +7,19 @@ import (
 )
 
 var schema = model.WebFormSchema{
-	ID:   "",
-	Name: "",
 	Sections: []*model.WebFormSection{
 		{
-			ID:            0,
-			Title:         "section1",
-			Description:   nil,
-			ResourceLinks: nil,
-			Subsections:   nil,
+			ID:          0,
+			Title:       "section1",
+			Description: "",
+			Subsections: nil,
 			Fields: []*model.WebFormField{
 				{
 					WebFormSubfield: &model.WebFormSubfield{
 						ID:               2,
 						Title:            "field1",
 						Type:             "",
-						Description:      nil,
+						Description:      "",
 						ValidationSchema: &model.WebFormValidationSchema{},
 					},
 					Subfields: []*model.WebFormSubfield{
@@ -30,14 +27,14 @@ var schema = model.WebFormSchema{
 							ID:               3,
 							Title:            "subfield1",
 							Type:             "",
-							Description:      nil,
+							Description:      "",
 							ValidationSchema: &model.WebFormValidationSchema{},
 						},
 						{
 							ID:               4,
 							Title:            "subfield2",
 							Type:             "",
-							Description:      nil,
+							Description:      "",
 							ValidationSchema: &model.WebFormValidationSchema{},
 						},
 					},
@@ -45,17 +42,15 @@ var schema = model.WebFormSchema{
 			},
 		},
 		{
-			ID:            1,
-			Title:         "section2",
-			Description:   nil,
-			ResourceLinks: nil,
+			ID:          1,
+			Title:       "section2",
+			Description: "",
 			Subsections: []*model.WebFormSection{{
-				ID:            7,
-				Title:         "subsection1",
-				Description:   nil,
-				ResourceLinks: nil,
-				Subsections:   nil,
-				Fields:        nil,
+				ID:          7,
+				Title:       "subsection1",
+				Description: "",
+				Subsections: nil,
+				Fields:      nil,
 			}},
 			Fields: []*model.WebFormField{
 				{
@@ -63,7 +58,7 @@ var schema = model.WebFormSchema{
 						ID:               5,
 						Title:            "field2",
 						Type:             "",
-						Description:      nil,
+						Description:      "",
 						ValidationSchema: &model.WebFormValidationSchema{},
 					},
 					Subfields: nil,
@@ -73,7 +68,7 @@ var schema = model.WebFormSchema{
 						ID:               6,
 						Title:            "field3",
 						Type:             "",
-						Description:      nil,
+						Description:      "",
 						ValidationSchema: &model.WebFormValidationSchema{},
 					},
 					Subfields: nil,
@@ -84,8 +79,8 @@ var schema = model.WebFormSchema{
 }
 
 func TestFormValidationHelper_GetField(t *testing.T) {
-	helper := NewFormValidationHelper()
-	helper.ParseForm(&schema, 5)
+	helper := NewFormValidationHelper(5)
+	helper.ParseForm(&schema)
 
 	field, err := helper.GetField(5)
 	assert.NoError(t, err)
@@ -104,8 +99,8 @@ func TestFormValidationHelper_GetField(t *testing.T) {
 }
 
 func TestFormValidationHelper_GetSection(t *testing.T) {
-	helper := NewFormValidationHelper()
-	helper.ParseForm(&schema, 5)
+	helper := NewFormValidationHelper(5)
+	helper.ParseForm(&schema)
 
 	field, err := helper.GetSection(1)
 	assert.NoError(t, err)
@@ -124,8 +119,8 @@ func TestFormValidationHelper_GetSection(t *testing.T) {
 }
 
 func TestFormValidationHelper_GetSubfield(t *testing.T) {
-	helper := NewFormValidationHelper()
-	helper.ParseForm(&schema, 5)
+	helper := NewFormValidationHelper(5)
+	helper.ParseForm(&schema)
 
 	field, err := helper.GetSubfield(3)
 	assert.NoError(t, err)
@@ -150,11 +145,11 @@ func TestFormValidationHelper_GetSubfield(t *testing.T) {
 }
 
 func TestFormValidationHelper_ParseForm(t *testing.T) {
-	helper := NewFormValidationHelper()
+	helper := NewFormValidationHelper(5)
 	assert.Empty(t, helper.elements)
 	assert.Empty(t, helper.errors)
 
-	helper.ParseForm(&schema, 5)
+	helper.ParseForm(&schema)
 	assert.NotEmpty(t, helper.elements)
 	assert.Empty(t, helper.errors)
 	assert.Equal(t, schema.Sections[0], helper.elements[0].Element)
@@ -166,30 +161,28 @@ func TestFormValidationHelper_ParseForm(t *testing.T) {
 	assert.Equal(t, schema.Sections[0].Fields[0].Subfields[0], helper.elements[3].Element)
 	assert.Equal(t, SUBFIELD, helper.elements[3].Type)
 
-	helper = NewFormValidationHelper()
-	err := helper.ParseForm(&schema, 0)
+	helper = NewFormValidationHelper(0)
+	err := helper.ParseForm(&schema)
 	assert.NotEmpty(t, err)
-	assert.Equal(t, "too many subsection levels", err[0].Message)
 
 	// duplicate id's
-	helper = NewFormValidationHelper()
+	helper = NewFormValidationHelper(5)
 	invalidSchema := model.WebFormSchema{
-		ID:   "",
-		Name: "",
+		Title: "",
 		Sections: []*model.WebFormSection{
-			{ID: 1, Title: "", Description: nil, ResourceLinks: nil, Subsections: nil, Fields: nil},
-			{ID: 1, Title: "", Description: nil, ResourceLinks: nil, Subsections: nil, Fields: nil},
-			{ID: 1, Title: "", Description: nil, ResourceLinks: nil, Subsections: nil, Fields: nil},
+			{ID: 1, Title: "", Description: "", Subsections: nil, Fields: nil},
+			{ID: 1, Title: "", Description: "", Subsections: nil, Fields: nil},
+			{ID: 1, Title: "", Description: "", Subsections: nil, Fields: nil},
 		},
 	}
 
-	err = helper.ParseForm(&invalidSchema, 5)
+	err = helper.ParseForm(&invalidSchema)
 	assert.Len(t, err, 2)
 }
 
 func TestFormValidationHelper_getElement(t *testing.T) {
-	helper := NewFormValidationHelper()
-	helper.ParseForm(&schema, 5)
+	helper := NewFormValidationHelper(5)
+	helper.ParseForm(&schema)
 
 	element, err := helper.getElement(0, SECTION)
 	assert.NoError(t, err)
@@ -221,18 +214,17 @@ func TestFormValidationHelper_getElement(t *testing.T) {
 
 func TestFormValidationHelper_parseSection(t *testing.T) {
 	section := &model.WebFormSection{
-		ID:            0,
-		Title:         "",
-		Description:   nil,
-		ResourceLinks: nil,
-		Subsections:   nil,
+		ID:          0,
+		Title:       "",
+		Description: "",
+		Subsections: nil,
 		Fields: []*model.WebFormField{
 			{
 				WebFormSubfield: &model.WebFormSubfield{
 					ID:               1,
 					Title:            "",
 					Type:             "",
-					Description:      nil,
+					Description:      "",
 					ValidationSchema: &model.WebFormValidationSchema{},
 				},
 				Subfields: nil,
@@ -240,7 +232,7 @@ func TestFormValidationHelper_parseSection(t *testing.T) {
 		},
 	}
 
-	helper := NewFormValidationHelper()
+	helper := NewFormValidationHelper(5)
 	helper.parseSection(section, 5)
 
 	assert.Equal(t, section, helper.elements[0].Element)
@@ -263,14 +255,12 @@ func TestFormValidationHelper_parseSection(t *testing.T) {
 		},
 	})
 
-	helper = NewFormValidationHelper()
+	helper = NewFormValidationHelper(2)
 	helper.parseSection(section, 2)
 	assert.NotEmpty(t, helper.errors)
-	assert.Equal(t, "too many subsection levels", helper.errors[0].Message)
-
 }
 
 func TestNewFormValidationHelper(t *testing.T) {
-	helper := NewFormValidationHelper()
+	helper := NewFormValidationHelper(2)
 	assert.NotNil(t, helper)
 }

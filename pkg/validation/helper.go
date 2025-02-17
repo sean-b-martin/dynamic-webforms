@@ -2,6 +2,7 @@ package validation
 
 import (
 	"github.com/sean-b-martin/dynamic-webforms/pkg/model"
+	"github.com/sean-b-martin/dynamic-webforms/pkg/validation/validator/common"
 )
 
 type schemaElementType int
@@ -18,20 +19,22 @@ type schemaElement struct {
 }
 
 type FormValidationHelper struct {
-	elements map[int]schemaElement
-	errors   []FormValidationError
+	elements     map[int]schemaElement
+	errors       []common.ValidatorError
+	maxRecursion int
 }
 
-func NewFormValidationHelper() *FormValidationHelper {
+func NewFormValidationHelper(maxRecursion int) *FormValidationHelper {
 	return &FormValidationHelper{
-		elements: make(map[int]schemaElement),
-		errors:   make([]FormValidationError, 0),
+		elements:     make(map[int]schemaElement),
+		errors:       nil,
+		maxRecursion: maxRecursion,
 	}
 }
 
-func (f *FormValidationHelper) ParseForm(schema *model.WebFormSchema, maxRecursion int) []FormValidationError {
+func (f *FormValidationHelper) ParseForm(schema *model.WebFormSchema) []common.ValidatorError {
 	for _, section := range schema.Sections {
-		f.parseSection(section, maxRecursion)
+		f.parseSection(section, f.maxRecursion)
 	}
 
 	return f.errors
@@ -39,14 +42,25 @@ func (f *FormValidationHelper) ParseForm(schema *model.WebFormSchema, maxRecursi
 
 func (f *FormValidationHelper) parseSection(schema *model.WebFormSection, maxRecursion int) {
 	if _, ok := f.elements[schema.ID]; ok {
-		f.errors = append(f.errors, NewSchemaError(schema.ID, "duplicate element id"))
+		err := common.NewFieldValidatorError(schema.ID)
+		err.AddFailedConstraint(common.FailedConstraintError{
+			Constraint: "unique id",
+			Message:    "id must be unique",
+		})
+		f.errors = append(f.errors, err)
 	}
 
 	f.elements[schema.ID] = schemaElement{SECTION, schema}
 
 	for _, subsection := range schema.Subsections {
 		if maxRecursion == 0 {
-			f.errors = append(f.errors, NewSchemaError(schema.ID, "too many subsection levels"))
+			err := common.NewFieldValidatorError(schema.ID)
+			err.AddFailedConstraint(common.FailedConstraintError{
+				Constraint: "subsections",
+				Message:    "recursion must be less than",
+				Config:     f.maxRecursion,
+			})
+			f.errors = append(f.errors, err)
 		} else {
 			f.parseSection(subsection, maxRecursion-1)
 		}
@@ -54,14 +68,24 @@ func (f *FormValidationHelper) parseSection(schema *model.WebFormSection, maxRec
 
 	for _, field := range schema.Fields {
 		if _, ok := f.elements[field.ID]; ok {
-			f.errors = append(f.errors, NewSchemaError(field.ID, "duplicate element id"))
+			err := common.NewFieldValidatorError(field.ID)
+			err.AddFailedConstraint(common.FailedConstraintError{
+				Constraint: "unique id",
+				Message:    "id must be unique",
+			})
+			f.errors = append(f.errors, err)
 		}
 
 		f.elements[field.ID] = schemaElement{FIELD, field}
 
 		for _, subfield := range field.Subfields {
 			if _, ok := f.elements[subfield.ID]; ok {
-				f.errors = append(f.errors, NewSchemaError(subfield.ID, "duplicate element id"))
+				err := common.NewFieldValidatorError(subfield.ID)
+				err.AddFailedConstraint(common.FailedConstraintError{
+					Constraint: "unique id",
+					Message:    "id must be unique",
+				})
+				f.errors = append(f.errors, err)
 			}
 			f.elements[subfield.ID] = schemaElement{SUBFIELD, subfield}
 		}
@@ -71,12 +95,12 @@ func (f *FormValidationHelper) parseSection(schema *model.WebFormSection, maxRec
 func (f *FormValidationHelper) getElement(id int, elementType schemaElementType) (schemaElement, error) {
 	if element, ok := f.elements[id]; ok {
 		if element.Type != elementType {
-			return schemaElement{}, WrongElementTypeError
+			return schemaElement{}, ErrWrongElementType
 		}
 
 		return element, nil
 	}
-	return schemaElement{}, ElementNotFoundError
+	return schemaElement{}, ErrElementNotFound
 }
 
 func (f *FormValidationHelper) GetSection(id int) (*model.WebFormSection, error) {

@@ -19,7 +19,7 @@ dynamic tables. Subfields within fields are used to implement complex types, lik
 The data that defines a form is called form schema. Each type of field allows different validation rules to be set.
 When a user fills out a form, the entered data can be validated against the rules set in the schema. The validation
 rules can be either simple, like a number field where the entered number must be between "min $A$ and max $B$" or complex, for 
-example, "when field $X$ has the value $Y$, then allow it".
+example, "when field $X$ has the value $Y$, then set field $Z$ to disabled".
 
 ## Motivation
 

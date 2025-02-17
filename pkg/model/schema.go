@@ -2,22 +2,19 @@ package model
 
 import "encoding/json"
 
-// WebFormSchema contains all Sections of a form. ID is not used directly and can get set freely.
+// WebFormSchema contains all Sections of a form
 type WebFormSchema struct {
-	ID       string            `json:"id"`
-	Name     string            `json:"name"`
+	Title    string            `json:"title"`
 	Sections []*WebFormSection `json:"sections"`
 }
 
-// WebFormSection contains 0 to n subsections and 0 to n fields. ResourceLinks are only used in the frontend to load
-// resources like files and images.
+// WebFormSection contains 0 to n subsections and 0 to n fields
 type WebFormSection struct {
-	ID            int               `json:"id"`
-	Title         string            `json:"name"`
-	Description   []string          `json:"description"`
-	ResourceLinks []string          `json:"resourceLinks"`
-	Subsections   []*WebFormSection `json:"subsections"`
-	Fields        []*WebFormField   `json:"fields"`
+	ID          int               `json:"id"`
+	Title       string            `json:"title"`
+	Description string            `json:"description"`
+	Subsections []*WebFormSection `json:"subsections"`
+	Fields      []*WebFormField   `json:"fields"`
 }
 
 // WebFormField is a WebFormSubfield with optional 0 to n Subfields. An example for Subfields are table columns.
@@ -30,9 +27,9 @@ type WebFormField struct {
 // WebFormSubfield contains all metadata for an input field in a web form.
 type WebFormSubfield struct {
 	ID               int                      `json:"id"`
-	Title            string                   `json:"name"`
+	Title            string                   `json:"title"`
 	Type             string                   `json:"type"`
-	Description      []string                 `json:"description"`
+	Description      string                   `json:"description"`
 	ValidationSchema *WebFormValidationSchema `json:"validationSchema"`
 }
 

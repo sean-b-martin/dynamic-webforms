@@ -6,7 +6,7 @@ import (
 )
 
 func TestWebForm_GenerateIDs(t *testing.T) {
-	form := WebFormSchema{ID: "test", Sections: make([]*WebFormSection, 0), Name: "Test"}
+	form := WebFormSchema{Sections: make([]*WebFormSection, 0), Title: "Test"}
 	form.Sections = append(form.Sections, &WebFormSection{Title: "Section1"}, &WebFormSection{Title: "Section2"})
 	form.Sections[1].Subsections = append(form.Sections[0].Subsections, &WebFormSection{Title: "Subsection1"},
 		&WebFormSection{Title: "Subsection2"})
@@ -46,7 +46,6 @@ func TestWebForm_GenerateIDs(t *testing.T) {
 	currentValue++
 	assert.Equal(t, currentValue, sections[1].Subsections[0].Fields[3].Subfields[1].ID)
 	currentValue++
-
 	assert.Equal(t, currentValue, sections[1].Subsections[1].ID)
 }
 
