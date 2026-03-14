@@ -1,6 +1,8 @@
 package validator
 
-import "errors"
+import (
+	"errors"
+)
 
 var ErrIndexOutOfBounds = errors.New("index out of bounds")
 
@@ -13,14 +15,44 @@ type Context struct {
 	Values []any
 }
 
-func (ctx *Context) Iter(ref *FieldRef) ([]any, error) {
+func (ctx *Context) Get(ref *FieldRef) (any, error) {
 	if ref.Index < 0 || ref.Index >= len(ctx.Values) {
 		return nil, ErrIndexOutOfBounds
 	}
+	return ctx.Values[ref.Index], nil
+}
 
-	field := ctx.Values[ref.Index]
-	if val, ok := field.([]any); ok {
-		return val, nil
+func (ctx *Context) ForEachValue(ref *FieldRef, fn func(val any) error) (*ValidationError, error) {
+	field, err := ctx.Get(ref)
+	if err != nil {
+		return nil, err
 	}
-	return []any{field}, nil
+
+	valErr := ValidationError{}
+	if value, ok := field.([]any); ok {
+		for i, v := range value {
+			if err := fn(v); err != nil {
+				valErr.AddFieldError(FieldError{
+					Name:  ref.Name,
+					Index: i,
+					Msg:   err.Error(),
+				})
+			}
+		}
+	} else {
+		// scalar value
+		if err := fn(field); err != nil {
+			valErr.AddFieldError(FieldError{
+				Name:  ref.Name,
+				Index: -1,
+				Msg:   err.Error(),
+			})
+		}
+	}
+
+	if !valErr.Empty() {
+		return &valErr, nil
+	}
+
+	return nil, nil
 }
